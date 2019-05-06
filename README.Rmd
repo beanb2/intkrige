@@ -1,0 +1,82 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# intkrige
+
+This package implements the interval-valued kriging models discussed in main manuscript.
+
+## Installation
+
+You can install the current version of the package by setting your current working directory to the parent folder and invoking the command
+
+``` r
+devtools::install()
+```
+
+Note that this version of installation requires the devtools package. Future installations will be available directly through CRAN.  
+
+## Example
+
+Once installed, this package can be used to run the interval-valued kriging models described in the main paper. For example, to generate the interval-valued predictions for a sample of populated locations in Utah run the following command. 
+
+```{r example}
+# First, define the location and elevation of interest. 
+# (In this case we pick coordinates of Utah State University)
+lats <- c(41.745)
+lons <- c(111.810)
+elevation <- c(1456)
+
+# Load the Utah Snow Load Data
+data(utsnow)
+
+# Scale the interval centers and radii
+cLM <- lm(center ~ ELEVATION, data = utsnow)
+utsnow$rC <- cLM$residuals
+utsnow$rR <- utsnow$radius*(utsnow$ELEVATION/median(utsnow$ELEVATION))
+
+# Extract the variograms using an automatic fitting technique
+utsnow.sp <- utsnow
+sp::coordinates(utsnow.sp) <- c("LONGITUDE", "LATITUDE")
+sp::proj4string(utsnow.sp) <- sp::proj4string(dem.ut)
+g1 <- gstat::gstat(NULL, "center", rC ~ 1, data = utsnow.sp)
+g1 <- gstat::gstat(g1, "radius", rR ~ 1, data = utsnow.sp)
+
+evgm <- gstat::variogram(g1)
+vsub1 <- evgm[evgm$id == "center", ]
+vsub2 <- evgm[evgm$id == "radius", ]
+vsub3 <- evgm[evgm$id == "center.radius", ]
+
+# Use gausian variogram for third model as the spherical variogram
+# is not stable.
+tvgm1 <- gstat::fit.variogram(vsub1, model = gstat::vgm("Sph"))
+tvgm2 <- gstat::fit.variogram(vsub2, model = gstat::vgm("Sph"))
+tvgm3 <- gstat::fit.variogram(vsub3, model = gstat::vgm("Gau"))
+
+# Prepare data for function input
+input_locs <- sp::coordinates(intUT.sp)
+input_int <- as.matrix(intUT[, c("rC", "rR")])
+pred_locs = matrix(c(lons, lats), ncol = 2)
+
+# Run a basic kriging model using argument defaults. 
+preds <- intkrige::intkrige(locations = input_locs, measurements = input_int, 
+                            newdata = pred_locs, modelC = tvgm1, 
+                            modelR = tvgm2, modelCR = tvgm3)
+
+
+
+```
+
+## Package Contents
+
+

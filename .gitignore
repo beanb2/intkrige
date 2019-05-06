@@ -1,0 +1,6 @@
+# Ignore raw data files (too big to push)
+raw/
+
+# Ignore R history and profile files
+.Rhistory
+.Rproj.user/
