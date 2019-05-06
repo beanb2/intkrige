@@ -4,3 +4,4 @@ raw/
 # Ignore R history and profile files
 .Rhistory
 .Rproj.user/
+.Rproj
