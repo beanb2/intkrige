@@ -2,24 +2,23 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' Distance matrix calculation.
-#' 
-#' Calculation of euclidean or geograhic distance. Based on an adaptation of 
-#' rdist.earth in the fields package. Uses earth radius = 6378.388 for 
+#'
+#' Calculation of euclidean or geograhic distance. Based on an adaptation of
+#' rdist.earth in the fields package. Uses earth radius = 6378.388 for
 #' great circle distance calculations.
-#' @param loc1/loc2 a two column matrix represeting the longitude and latitudes 
-#'              respectively. For pairwise distance matrices, the input for these
-#'              two arguments should be identical. 
+#' @param loc1 a two column matrix represeting the longitude/latitude
+#' (i.e. x/y) coordinates of the first set of distances.
+#' @param loc2 a two column matrix representing the longitude/latitude
+#' (i.e. x/y) coordinates of the second set of distances
+#' (for pairwise distnace matrix set loc1 = loc2).
 #' @param geographic If TRUE, calculate great circle distance. If FALSE, calculate
 #'              Euclidean distance.
 #' @return Matrix of pairwise distances between each combination of rows from loc1
 #' and loc2 respectively.
 #' @examples
-#' data(samples)
-#' data(newData)
-#' locs1 <- coordinates(samples)
-#' values <- as.matrix(data.frame(truthC = samples$truthC, truthR = samples$truthR))
-#' locs2 <- coordinates(newData)
-#' distMat <- dist_cpp(locs1, locs2, geographic = FALSE)
+#' data(utsnow)
+#' locs1 <- matrix(utsnow[, c("LONGITUDE", "LATITUDE")], ncol = 2)
+#' distMat <- dist_cpp(locs1, locs1, geographic = TRUE)
 #' @export
 dist_cpp <- function(loc1, loc2, geographic) {
     .Call(`_intkrige_dist_cpp`, loc1, loc2, geographic)

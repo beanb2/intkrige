@@ -36,6 +36,13 @@ distances.
 }
 }
 
+\section{Data}{
+
+\itemize{
+\item \link{UTsnow} An interval-valued design ground snow load dataset for Utah.
+}
+}
+
 \author{
 Brennan Bean \email{brennan.bean.20@gmail.com}
 }

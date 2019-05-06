@@ -61,49 +61,8 @@
 #' @useDynLib intkrige, .registration = TRUE
 #' @importFrom Rcpp evalCpp
 #'
-#'
-#' @examples
-#' library(gstat)
-#' data(samples)
-#' data(newData)
-#' locs1 <- coordinates(samples)
-#' values <- as.matrix(data.frame(truthC = samples$truthC,
-#' truthR = samples$truthR))
-#' locs2 <- coordinates(newData)
-#'
-#' modelC = vgm(1, "Exp", 1/4)
-#' modelR = vgm(1, "Exp", 1/5)
-#'
-#' # Simple kriging test
-#' test.simple <- intkrige(locs1, values, locs2,
-#'                           modelC, modelR, modelCR = NULL, eta = .75,
-#'                           A = c(1, 1, 0), trend = 0, thresh = 100,
-#'                           tolq = .001, maxp = 100, tolp = .001,
-#'                           maxq = 100, r = 100)
-#'
-#' # Ordinary kriging test (takes much longer to run, hence the subsetting)
-#' test.ordinary <- intkrige(locs1, values, locs2,
-#'                           modelC, modelR, modelCR = NULL, eta = 0.75,
-#'                           A = c(1, 1, 0), trend = NULL, thresh = 100,
-#'                           tolq = .001, maxp = 100, tolp = .001,
-#'                           maxq = 100, r = 100)
-#'
-#'
-#' newData$PredictC <- test.simple[, 1]
-#' newData$PredictR <- test.simple[, 2]
-#'
-#' newData$PredictC2 <- test.ordinary[, 1]
-#' newData$PredictR2 <- test.ordinary[, 2]
-#'
-#' l2Dist.simple <- mean(sqrt((newData$PredictC - newData$truthC)^2 +
-#'                    (newData$PredictR - newData$truthR)^2))
-#'
-#' l2Dist.ordinary <- mean(sqrt((newData$PredictC2 - newData$truthC)^2 +
-#'                    (newData$PredictR2 - newData$truthR)^2))
-#' l2Dist.simple
-#' l2Dist.ordinary
-#'
 #' @export
+# TODO: Examples.
 intkrige <- function(locations, measurements, newdata,
                      modelC, modelR, modelCR = NULL,
                      eta = 0.75, A = c(1, 1, 0), trend = NULL,

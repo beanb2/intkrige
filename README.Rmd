@@ -73,8 +73,8 @@ preds <- intkrige::intkrige(locations = input_locs, measurements = input_int,
                             newdata = pred_locs, modelC = tvgm1, 
                             modelR = tvgm2, modelCR = tvgm3)
 
-
-
+# Print results to screen 
+preds
 ```
 
 ## Package Contents

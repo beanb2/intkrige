@@ -7,27 +7,27 @@
 dist_cpp(loc1, loc2, geographic)
 }
 \arguments{
+\item{loc1}{a two column matrix represeting the longitude/latitude
+(i.e. x/y) coordinates of the first set of distances.}
+
+\item{loc2}{a two column matrix representing the longitude/latitude
+(i.e. x/y) coordinates of the second set of distances
+(for pairwise distnace matrix set loc1 = loc2).}
+
 \item{geographic}{If TRUE, calculate great circle distance. If FALSE, calculate
 Euclidean distance.}
-
-\item{loc1/loc2}{a two column matrix represeting the longitude and latitudes 
-respectively. For pairwise distance matrices, the input for these
-two arguments should be identical.}
 }
 \value{
 Matrix of pairwise distances between each combination of rows from loc1
 and loc2 respectively.
 }
 \description{
-Calculation of euclidean or geograhic distance. Based on an adaptation of 
-rdist.earth in the fields package. Uses earth radius = 6378.388 for 
+Calculation of euclidean or geograhic distance. Based on an adaptation of
+rdist.earth in the fields package. Uses earth radius = 6378.388 for
 great circle distance calculations.
 }
 \examples{
-data(samples)
-data(newData)
-locs1 <- coordinates(samples)
-values <- as.matrix(data.frame(truthC = samples$truthC, truthR = samples$truthR))
-locs2 <- coordinates(newData)
-distMat <- dist_cpp(locs1, locs2, geographic = FALSE)
+data(utsnow)
+locs1 <- matrix(utsnow[, c("LONGITUDE", "LATITUDE")], ncol = 2)
+distMat <- dist_cpp(locs1, locs1, geographic = TRUE)
 }

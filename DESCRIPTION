@@ -17,6 +17,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: Rcpp (>= 1.0.0), RcppArmadillo, gstat, Rdpack
+Suggests: doParallel, foreach
+Depends: R (>= 3.5.0)
 RdMacros: Rdpack
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.1.1
