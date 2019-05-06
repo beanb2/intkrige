@@ -28,6 +28,6 @@ great circle distance calculations.
 }
 \examples{
 data(utsnow)
-locs1 <- matrix(utsnow[, c("LONGITUDE", "LATITUDE")], ncol = 2)
+locs1 <- as.matrix(utsnow[, c("LONGITUDE", "LATITUDE")])
 distMat <- dist_cpp(locs1, locs1, geographic = TRUE)
 }

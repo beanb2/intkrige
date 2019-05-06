@@ -20,7 +20,7 @@
 #'
 #' @section Data:
 #' \itemize{
-#' \item \link{UTsnow} An interval-valued design ground snow load dataset for Utah.
+#' \item \link{utsnow} An interval-valued design ground snow load dataset for Utah.
 #' }
 #'
 #'
