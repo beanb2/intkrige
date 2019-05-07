@@ -1,58 +1,50 @@
----
-output: github_document
-bibliography: inst/REFERENCES.bib
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+intkrige
+========
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-# intkrige
+This package implements the interval-valued kriging models described in Bean et. al. (2019a). Details regarding the algorithmic implementation can be found in Bean et. al. (2019b).
 
-This package implements the interval-valued kriging models described in Bean et. al. [-@Bean2019-int]. Details regarding the algorithmic implementation can be found in Bean et. al. [-@Bean2019-int2].
+Installation
+------------
 
-## Installation
-
-This is a preliminary version of the intkrige package that will be submitted to CRAN. The public package will include additional user functions and visualization tools designed to simplify and enhance interval-valued spatial data analysis. This developmental version of the pacakge can be installed by setting the parent folder as your source file location and invoking the command.  
+This is a preliminary version of the intkrige package that will be submitted to CRAN. The public package will include additional user functions and visualization tools designed to simplify and enhance interval-valued spatial data analysis. This developmental version of the pacakge can be installed by setting the parent folder as your source file location and invoking the command.
 
 ``` r
 devtools::install()
 ```
 
-Note that the developmental installation makes use of the devtools package [@devtools2019]. The most current version of this package can be found at \url{https://github.com/r-lib/devtools}. 
+Note that the developmental installation makes use of the devtools package (Wickham, Hester, and Chang 2019). The most current version of this package can be found at .
 
-
-## Package Contents
+Package Contents
+----------------
 
 The current version of the package contains one main function named intkrige. Information about this package can be obtained by entering
-```r
+
+``` r
 ?intkrige::intkrige
 ```
-in the console. 
+
+in the console.
 
 The package also contains an inter-valued design ground snow load datset named utsnow. This data is available by installing the intkrige package and invoking the command
 
-```r
+``` r
 data(utsnow)
 ```
 
-Documentation for this dataset can be obtained through the command 
+Documentation for this dataset can be obtained through the command
 
-```r
+``` r
 ?utsnow
 ```
 
-## Example
+Example
+-------
 
-Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. [@Bean2019-int]. The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah. This example makes use of several existing resources available in the gstat and sp packages. 
+Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. (Bean, Sun, and Maguire 2019a). The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah.
 
-```{r example}
+``` r
 # First, define the location and elevation of interest. 
 # (In this case we pick coordinates of Utah State University)
 lats <- c(41.745)
@@ -102,15 +94,22 @@ preds <- intkrige::intkrige(locations = input_locs, measurements = input_int,
 
 # The final results are predicted intervals after removing the effect of elevation.  
 preds
+#>             [,1]      [,2]      [,3] [,4]
+#> [1,] -0.06162802 0.6482878 0.5857494    0
 ```
 
-Note that the prediction for a single location returns four outputs including (in order): 
+Note that the prediction for a single location returns four outputs including (in order):
 
-- center prediction
-- radius prediction
-- kriging prediction variance
-- 0-1 warning for non-convergent optimization (1 if warning, 0 if not). 
+-   center prediction
+-   radius prediction
+-   kriging prediction variance
+-   0-1 warning for non-convergent optimization (1 if warning, 0 if not).
 
-# References
+References
+==========
 
+Bean, Brennan, Yan Sun, and Marc Maguire. 2019a. “Interval-Valued Kriging Models for Geostatistical Mapping with Uncertain Inputs.”
 
+———. 2019b. “Supplement to ‘Interval-Valued Kriging Models for Geostatistical Mapping with Uncertain Inputs’.”
+
+Wickham, Hadley, Jim Hester, and Winston Chang. 2019. *Devtools: Tools to Make Developing R Packages Easier*. <https://github.com/r-lib/devtools>.

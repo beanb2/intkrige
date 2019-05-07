@@ -54,9 +54,17 @@
 #' Parallel processing is only relevant if you are predicting
 #' for more than one location.
 #' Note there is no parallel option when useR = FALSE.
-#' @return A matrix with three columns containing the predicted centers
-#' and radii for the locations of interest (columns 1 and 2) as well as the
-#' prediction variance according to the distance matrix determined by A.
+#' @return A matrix with 4 columns where rows correspond to the prediction
+#' locations and columns correspond to:
+#'
+#' - center prediction
+#'
+#' - radius predictions
+#'
+#' - kriging prediction variance
+#'
+#' - warning column for non-convergent optimization problem
+#' (0 - no warning, 1 - warning)
 #'
 #' @useDynLib intkrige, .registration = TRUE
 #' @importFrom Rcpp evalCpp

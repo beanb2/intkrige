@@ -3,4 +3,5 @@
 export(dist_cpp)
 export(intkrige)
 importFrom(Rcpp,evalCpp)
+importFrom(Rdpack,reprompt)
 useDynLib(intkrige, .registration = TRUE)

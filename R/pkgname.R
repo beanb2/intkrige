@@ -25,6 +25,7 @@
 #'
 #'
 #' @author Brennan Bean \email{brennan.bean.20@@gmail.com}
+#' @importFrom Rdpack reprompt
 "_PACKAGE"
 
-#' @importFrom Rdpack reprompt
+
