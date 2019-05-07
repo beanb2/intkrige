@@ -42,7 +42,7 @@ Documentation for this dataset can be obtained through the command
 Example
 -------
 
-Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. (Bean, Sun, and Maguire 2019a). The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah.
+Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. (Bean, Sun, and Maguire 2019a). The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah. This example makes use of several existing resources available in the gstat and sp packages (Pebesma 2004; Gräler, Pebesma, and Heuvelink 2016; Bivand et al. 2013).
 
 ``` r
 # First, define the location and elevation of interest. 
@@ -111,5 +111,11 @@ References
 Bean, Brennan, Yan Sun, and Marc Maguire. 2019a. “Interval-Valued Kriging Models for Geostatistical Mapping with Uncertain Inputs.”
 
 ———. 2019b. “Supplement to ‘Interval-Valued Kriging Models for Geostatistical Mapping with Uncertain Inputs’.”
+
+Bivand, Roger S, Edzer J Pebesma, Virgilio Gomez-Rubio, and Edzer Jan Pebesma. 2013. *Applied Spatial Data Analysis with R*. 2nd ed. Vol. 747248717. Springer.
+
+Gräler, Benedikt, Edzer Pebesma, and Gerard Heuvelink. 2016. “Spatio-Temporal Interpolation Using Gstat.” *The R Journal* 8 (1): 204–18. <https://journal.r-project.org/archive/2016-1/na-pebesma-heuvelink.pdf>.
+
+Pebesma, Edzer J. 2004. “Multivariable Geostatistics in S: The Gstat Package.” *Computers & Geosciences* 30: 683–91.
 
 Wickham, Hadley, Jim Hester, and Winston Chang. 2019. *Devtools: Tools to Make Developing R Packages Easier*. <https://github.com/r-lib/devtools>.

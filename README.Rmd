@@ -50,7 +50,7 @@ Documentation for this dataset can be obtained through the command
 
 ## Example
 
-Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. [@Bean2019-int]. The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah. This example makes use of several existing resources available in the gstat and sp packages. 
+Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. [@Bean2019-int]. The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah. This example makes use of several existing resources available in the gstat and sp packages [@gstat1; @gstat2; @Bivand2008]. 
 
 ```{r example}
 # First, define the location and elevation of interest. 
