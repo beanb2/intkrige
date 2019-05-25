@@ -1,3 +1,5 @@
+# The following link saved my bacon when trying to document s4 methods:
+# - https://github.com/variani/pckdev/wiki/Documenting-with-roxygen2#s4-methods
 #' @import utils
 #' @importFrom methods new
 NULL
