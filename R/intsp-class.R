@@ -3,30 +3,8 @@
 # This is the "intsp" class, which extends the "SpatialPointsDataFrame"
 # class. All we do is add a slot for intervals that can be called by plot,
 # print, and summary functions.
-#' @import sp
-#' @import gstat
 NULL
-#' @export
-methods::setClass("intsp",
-                  contains = "SpatialPointsDataFrame",
-                  slots = c(interval = "matrix"))
 #=============================================================================
-
-### CREATE GENERICS ###
-#=============================================================================
-# Generic to change the contents of the "intsp" interval slot.
-#' @export
-methods::setGeneric("interval",
-                    function(x, cr = FALSE)
-                      standardGeneric("interval"))
-
-# Generic to inititate the contents of the "intsp" interval slot.
-#' @export
-methods::setGeneric("interval<-",
-                    function(x, value, ...)
-                      standardGeneric("interval<-"))
-#=============================================================================
-
 
 ### CREATE METHODS FOR GENERICS ###
 #=============================================================================
@@ -34,202 +12,343 @@ methods::setGeneric("interval<-",
 # coordinate, and interval slots when looking for a subset.
 # Adapted from:
 # - https://github.com/edzer/sp/blob/master/R/SpatialPoints-methods.R
+#' Atomic subset operator for intsp data
+#'
+#' This method extends the traditional \'$\' operator by also looking in the
+#' interval slot for the requested variable.
+#'
+#' @param x an object of class intsp
+#' @param name the variable name from which to subset
+#'
+#' @return a vector containing the requested data.
+#'
+#' @name $
 #' @export
-setMethod("$", "intsp",
-          function(x, name) {
-            if (name %in% coordnames(x))
-              return(x@coords[,name])
-            if (name %in% colnames(x@interval))
-              return(x@interval[, name])
-            if (!("data" %in% slotNames(x)))
-              stop("no $ method for object without attributes")
-            x@data[[name]]
-          }
+methods::setMethod("$", "intsp",
+                   function(x, name) {
+                     if (name %in% sp::coordnames(x))
+                       return(x@coords[,name])
+                     if (name %in% colnames(x@interval))
+                       return(x@interval[, name])
+                     if (!("data" %in% methods::slotNames(x)))
+                       stop("no $ method for object without attributes")
+                     x@data[[name]]
+                   }
 )
 
 # This method stops users from editing the coordinates or intervals
 # using the standard "$" operator.
 # Adapted from:
 # - https://github.com/edzer/sp/blob/master/R/Spatial-methods.R
+#' Atomic assignment operator for intsp data
+#'
+#' This method extends the traditional \'$\' operator by also looking in the
+#' interval slot for the requested variable.
+#'
+#' @param x an object of class intsp
+#' @param name the variable name from which to subset
+#' @param value values to replace the current data in the variable
+#'
+#' @return a vector containing the requested data.
+#'
+#' @name $<-
 #' @export
-setMethod("$<-", "intsp",
-          function(x, name, value) {
-            if (name %in% coordnames(x))
-              stop(paste(name,
-                         "is a coordinate name, please choose another name"))
-            # Addition for coordinate slot.
-            if (name %in% colnames(x@interval))
-              stop(paste(name, "is currently assigned to the interval slot,
+methods::setMethod("$<-", "intsp",
+                   function(x, name, value) {
+                     if (name %in% sp::coordnames(x))
+                       stop(paste(name,
+                                  "is a coordinate name, please choose another name"))
+                     # Addition for coordinate slot.
+                     if (name %in% colnames(x@interval))
+                       stop(paste(name, "is currently assigned to the interval slot,
                          please choose another name"))
-            if (!("data" %in% slotNames(x))) {
-              df = list(value); names(df) = name
-              return(addAttrToGeom(x, data.frame(df), match.ID = FALSE))
-              # stop("no $<- method for object without attributes")
-            }
-            #if (is.list(value))
-            #	warning("assigning list or data.frame to attribute vector")
-            x@data[[name]] = value
-            x
-          }
+                     if (!("data" %in% methods::slotNames(x))) {
+                       df = list(value); names(df) = name
+                       return(addAttrToGeom(x, data.frame(df), match.ID = FALSE))
+                       # stop("no $<- method for object without attributes")
+                     }
+                     #if (is.list(value))
+                     #	warning("assigning list or data.frame to attribute vector")
+                     x@data[[name]] = value
+                     x
+                   }
 )
 
 # This method returns the interval slot.
+
+#' Create an intsp class object
+#'
+#' @param x an object of class intsp
+#' @return the interval slot of an intsp object
+#'
+#' @name interval
 #' @export
-setMethod("interval", "intsp", function(x, cr = FALSE) {
-    return(x@interval)
+methods::setMethod("interval", "intsp", function(x) {
+  return(x@interval)
 })
 
 # This method allows the user to define (or redefine) the
 # interval slot for an existing intsp object.
+#' Reassign values in the interval slot
+#'
+#' @param x an object of class intsp
+#' @return an object of class intsp with a reassigned interval slot
+#'
+#' @name interval<-
 #' @export
-setMethod("interval<-", "intsp",
-          function(x, value, cr = FALSE) {
-            # Ensure that only numeric variables are placed in the interval
-            if (class(x@data[, value[1]]) != "numeric" ||
-                class(x@data[, value[1]]) != "numeric") {
-              stop("non-numeric input detected")
-            }
+methods::setMethod("interval<-", "intsp",
+                   function(x, value) {
 
-            # If the interval slot is not empty, return these values
-            # to the data frame.
-            if (nrow(x@interval) > 0) {
-              x@data <- cbind(x@data, as.data.frame(x@interval))
-            }
+                     # A null or na value will cause the intsp object to revert to
+                     # its parent class.
+                     if(is.null(value) || is.na(value)){
+                       # If the interval slot is not empty, return these values
+                       # to the data frame.
+                       if (nrow(x@interval) > 0) {
+                         x@data <- cbind(x@data, as.data.frame(x@interval))
+                       }
 
-            # Fill the interval slot with the requested columns.
-            x@interval <-
-              matrix(c(x@data[, value[1]], x@data[, value[2]]), ncol = 2)
+                       x <- methods::as(x, "SpatialPointsDataFrame")
 
-            # Remove the variables that are now in the interval slot from the
-            # data frame.
-            x@data[, value[1]] <- NULL
-            x@data[, value[2]] <- NULL
+                       return(x)
+                     }
 
-            # Preserve the column names in the interval slot.
-            colnames(x@interval) <- c(value[1], value[2])
+                     # If a character string is provided, then search the data frame
+                     # for the values to place in the interval slot.
+                     if(class(value) == "character"){
+                       if(length(character) != 2){
+                         stop("exactly two variable names are needed
+                     to define an interval")
+                       }
+                       # Ensure that only numeric variables are placed in the interval
+                       if (class(x@data[, value[1]]) != "numeric" ||
+                           class(x@data[, value[1]]) != "numeric") {
+                         stop("non-numeric input detected")
+                       }
 
-            # Add whether or not the interval is defined
-            # with a center/radius specification.
-            attr(x@interval, "centerRadius") <- cr
+                       # If the interval slot is not empty, return these values
+                       # to the data frame.
+                       if (nrow(x@interval) > 0) {
+                         x@data <- cbind(x@data, as.data.frame(x@interval))
+                       }
 
-            return(x)
-          })
+                       # Fill the interval slot with the requested columns.
+                       x@interval <-
+                         matrix(c(x@data[, value[1]], x@data[, value[2]]), ncol = 2)
+
+                       # Remove the variables that are now in the interval slot from the
+                       # data frame.
+                       x@data[, value[1]] <- NULL
+                       x@data[, value[2]] <- NULL
+
+                       # Preserve the column names in the interval slot.
+                       colnames(x@interval) <- c(value[1], value[2])
+
+                       return(x)
+                       # If a matrix is input, allow the interval values to be replaced.
+                     }else if(class(value) == "matrix"){
+                       # Ensure that the number of rows in the replacement
+                       # matches the number of rows expected.
+                       if(nrow(value) != nrow(coordinates(x@coords)) ||
+                          ncol(value) != ncol(coordinates(x@coords))){
+                         stop("matrix dimensions must match the slot dimensions")
+                       }
+
+                       # Replace the values in the interval slot.
+                       x@interval <- value
+
+                       # Check to ensure that the lower enpoints are defined first
+                       if(any(x@interval[, 1] > x@interval[, 2])){
+                         stop("detected lower endpoint greater than upper endpoint")
+                       }
+
+                       return(x)
+                     }else{
+                       stop("\'value\' must be a vector of column names or a matrix")
+                     }
+                   })
 
 # This method allows a user to create an intsp object by
 # definining the interval slot. (Similar to sp::coordinates).
+#' Convert a SpatialPointsDataFrame object to an intsp object.
+#'
+#' @param x an object of class SpatialPointsDataFrame
+#' @return an object of class intsp
+#'
+#'
+#' @name interval<-
 #' @export
-setMethod("interval<-", "SpatialPointsDataFrame",
-          function(x, value, cr = FALSE) {
-            x <- as(x, "intsp")
+methods::setMethod("interval<-", "SpatialPointsDataFrame",
+                   function(x, value) {
 
-            # Ensure that only numeric variables are placed in the interval
-            if (class(x@data[, value[1]]) != "numeric" ||
-                class(x@data[, value[1]]) != "numeric") {
-              stop("non-numeric input detected")
-            }
+                     if(is.null(value) || is.na(value)){
+                       warning("No interval provided, interval not specified.")
+                       return(x)
+                     }
 
-            # If the interval slot is not empty, return these values
-            # to the data frame.
-            if (nrow(x@interval) > 0) {
-              x@data <- cbind(x@data, as.data.frame(x@interval))
-            }
+                     x <- methods::as(x, "intsp")
 
-            # Fill the interval slot with the requested columns.
-            x@interval <-
-              matrix(c(x@data[, value[1]], x@data[, value[2]]), ncol = 2)
+                     if(class(value) == "character"){
+                       # Ensure that only numeric variables are placed in the interval
+                       if (class(x@data[, value[1]]) != "numeric" ||
+                           class(x@data[, value[1]]) != "numeric") {
+                         stop("non-numeric input detected")
+                       }
 
-            # Remove the variables that are now in the interval slot from the
-            # data frame.
-            x@data[, value[1]] <- NULL
-            x@data[, value[2]] <- NULL
+                       # Fill the interval slot with the requested columns.
+                       x@interval <-
+                         matrix(c(x@data[, value[1]], x@data[, value[2]]), ncol = 2)
 
-            # Preserve the column names in the interval slot.
-            colnames(x@interval) <- c(value[1], value[2])
+                       # Remove the variables that are now in the interval slot from the
+                       # data frame.
+                       x@data[, value[1]] <- NULL
+                       x@data[, value[2]] <- NULL
 
-            # Add whether or not the interval is defined
-            # with a center/radius specification.
-            attr(x@interval, "centerRadius") <- cr
+                       # Preserve the column names in the interval slot.
+                       colnames(x@interval) <- c(value[1], value[2])
 
-            return(x)
-          })
+                       return(x)
+                     }else if(class(value) == "matrix"){
+                       # Ensure that the number of rows in the replacement
+                       # matches the number of rows expected.
+                       if(nrow(value) != nrow(coordinates(x@coords)) ||
+                          ncol(value) != ncol(coordinates(x@coords))){
+                         stop("matrix dimensions must match the slot dimensions")
+                       }
+
+                       # Replace the values in the interval slot.
+                       x@interval <- value
+
+                       # Check to ensure that the lower enpoints are defined first
+                       if(any(x@interval[, 1] > x@interval[, 2])){
+                         stop("detected lower endpoint greater than upper endpoint")
+                       }
+
+                       return(x)
+                     }else{
+                       stop("\'value\' must be a vector of column names or a matrix")
+                     }
+                   })
 
 # This method redefines how to print the intsp object to the screen.
 # Adapted from SP
+#' Print the contents of an intsp object
+#'
+#' This function extends print.sp by including a display and summary of the
+#' interval slot for the object.
+#'
+#' @param x an object of class intsp
+#' @param ... additional arguments to base::print
+#' @param digits default option from sp package
+#' @return nothing
+#'
 #' @export
 print.intsp = function(x, ..., digits = getOption("digits")) {
-    cc = substring(paste(as.data.frame(
-      t(signif(coordinates(x), digits)))),2,999)
-    int = paste("[", as.data.frame(
-      t(signif(interval(x), digits))), "]", sep = "")
-    int <- gsub(int, pattern = "[()c]", replacement = "")
+  cc = substring(paste(as.data.frame(
+    t(signif(sp::coordinates(x), digits)))),2,999)
+  int = paste("[", as.data.frame(
+    t(signif(intkrige::interval(x), digits))), "]", sep = "")
+  int <- gsub(int, pattern = "[()c]", replacement = "")
 
-    # drop = false ensures the resul remains a data frame and
-    # cannot be converted to a vector.
-    df = data.frame("coordinates" = cc, "interval" = int, x@data)
+  # drop = false ensures the resul remains a data frame and
+  # cannot be converted to a vector.
+  df = data.frame("coordinates" = cc, "interval" = int, x@data)
 
-    row.names(df) <- row.names(x@data)
+  row.names(df) <- row.names(x@data)
   print(df, ..., digits = digits)
 }
-setMethod("show", "intsp", function(object) print(object))
+methods::setMethod("show", "intsp", function(object) print(object))
 
 # This method redefines how to print the head the intsp object to the screen.
 # Adapted from SP
+# This method redefines how to print the heaf intsp object to the screen.
+# Adapted from SP
+#' Print the head of an intsp object.
+#'
+#' This function extends print.sp by including a display and summary of the
+#' interval slot for the object.
+#'
+#' @param x an object of class intsp
+#' @param n number of rows to print to the screen
+#' @param ... additional arguments to print
+#' @param digits determines how values are printed to the screen
+#' (default from sp package)
+#' @return nothing
+#'
 #' @export
-head.intsp = function(x, ..., digits = getOption("digits")) {
+head.intsp = function(x, n = 6, ..., digits = getOption("digits")) {
   cc = substring(paste(as.data.frame(
-    t(signif(coordinates(x), digits)))),2,999)
+    t(signif(sp::coordinates(x), digits)))),2,999)
   int = paste("[", as.data.frame(
-    t(signif(interval(x), digits))), "]", sep = "")
+    t(signif(intkrige::interval(x), digits))), "]", sep = "")
   int <- gsub(int, pattern = "[()c]", replacement = "")
   df = data.frame("coordinates" = cc, "interval" = int, x@data)
 
-  row.names(df) <- row.names(x@data)
-  print(df[1:6, ], ..., digits = digits)
+  row.names(df) <- c("coordinates", "interval", row.names(x@data))
+  print(df[1:n, ], ..., digits = digits)
 }
-setMethod("show", "intsp", function(object) print(object))
 
 # This method redefines how to print the tail of the intsp object to the screen.
 # Adapted from SP
+#' Print the tail of an intsp object.
+#'
+#' This function extends print.sp by including a display and summary of the
+#' interval slot for the object.
+#'
+#' @param x an object of class intsp
+#' @param n number of rows to print to the screen
+#' @param ... additional arguments to utils::tail()
+#' @param digits determines how numbers are displayed (default taken from
+#' package sp)
+#' @return nothing
+#'
 #' @export
-tail.intsp = function(x, ..., digits = getOption("digits")) {
+tail.intsp = function(x, n = 6, ..., digits = getOption("digits")) {
   cc = substring(paste(as.data.frame(
-    t(signif(coordinates(x), digits)))),2,999)
+    t(signif(sp::coordinates(x), digits)))),2,999)
   int = paste("[", as.data.frame(
-    t(signif(interval(x), digits))), "]", sep = "")
+    t(signif(intkrige::interval(x), digits))), "]", sep = "")
   int <- gsub(int, pattern = "[()c]", replacement = "")
   df = data.frame("coordinates" = cc, "interval" = int, x@data)
 
-  row.names(df) <- row.names(x@data)
-  print(df[(nrow(df)-5):nrow(df), ], ..., digits = digits)
+  row.names(df) <- c("coordinates", "interval", row.names(x@data))
+  print(df[(nrow(df)-(n-1)):nrow(df), ], ..., digits = digits)
 }
-setMethod("show", "intsp", function(object) print(object))
 
 
 # This method adapts the summary.spatial to include a covariance matrix
 # for the interval-center and radii in the output.
+#' Sumarize the contents of an intsp object, including special summaries for
+#' the interval slot.
+#'
+#' @param object an object of class intsp
+#' @param ... additional arguments to base::summary().
+#' @return nothing
+#' @method summary intsp
 #' @export
 summary.intsp = function(object, ...) {
   obj = list()
   obj[["class"]] = class(object)
-  obj[["bbox"]] = bbox(object)
-  obj[["is.projected"]] = is.projected(object)
+  obj[["bbox"]] = sp::bbox(object)
+  obj[["is.projected"]] = sp::is.projected(object)
   obj[["proj4string"]] = object@proj4string@projargs
   # Add the covariance matrix for center/radius interaction.
-  obj[["vcov"]] <- cov(interval(object))
-  obj[["itvl"]] <- summary(interval(object))
-  if (is(object, "SpatialPoints"))
-    obj[["npoints"]] = nrow(object@coords)
-  if (is(object, "SpatialGrid") || is(object, "SpatialPixels"))
-    obj[["grid"]] = gridparameters(object)
-  obj[["vcov"]] <- cov(interval(object))
-  obj[["itvl"]] <- summary(interval(object))
-  if ("data" %in% slotNames(object) && ncol(object@data) > 0)
+  obj[["vcov"]] <- stats::cov(intkrige::interval(object))
+  obj[["itvl"]] <- summary(intkrige::interval(object))
+  obj[["npoints"]] = nrow(object@coords)
+  if ("data" %in% methods::slotNames(object) && ncol(object@data) > 0)
     obj[["data"]] = summary(object@data)
   class(obj) = "summary.intsp"
   obj
 }
-setMethod("summary", "intsp", summary.intsp)
+methods::setMethod("summary", "intsp", summary.intsp)
 
+# This method defines how intsp objects are printed to the screen.
+#' Print the object summary to the screen.
+#'
+#' @param x an object an object of class intsp
+#' @param ... additional arguments to base::print()
+#' @return nothing
 #' @export
 print.summary.intsp = function(x, ...) {
   cat(paste("Object of class ", x[["class"]], "\n", sep = ""))
@@ -255,8 +374,8 @@ print.summary.intsp = function(x, ...) {
     print(x$grid, ...)
   }
   if (!is.null(x[["vcov"]])) {
-  cat("center-radius covariance matrix:\n")
-  print(x[["vcov"]], ...)
+    cat("center-radius covariance matrix:\n")
+    print(x[["vcov"]], ...)
   }
   if (!is.null(x[["itvl"]])) {
     cat("enpoints:\n")
@@ -267,5 +386,169 @@ print.summary.intsp = function(x, ...) {
     print(x$data, ...)
   }
   invisible(x)
+} # No "setMethod" as this directly calls intsp.
+
+#' Function to create a variogram object for interval-valued data.
+#' A wrapper to gstat::gstat() that fits all of the empirical variograms for
+#' the interval slot of an intsp object.
+#'
+#' @param x an object of class intsp
+#' @param forumas a list of length two specifying the equations for
+#' the center and radius. Changes from the default equation are only relevant
+#' if the user wants to center or scale the intervals according to another
+#' variable(s).
+#' @param ... additional arguments to gstat::gstat().
+#'
+#' @name intvariogram
+#' @export
+methods::setMethod("intvariogram", "intsp",
+                   function(x, formulas = list(center ~ 1, radius ~ 1), ...){
+                     # First ensure that the center and
+                     # radius are included in the proper formulas
+                     # (When strings are converted to strings, mathematical operators
+                     # act as a string split. Because we simply need "center" and
+                     # "radius" to appear somewhere in the text, we use the "any"
+                     # function to return one logical)
+                     check1 <- any(regexpr(pattern = "center",
+                                           text = formulas[[1]][[2]]) > 0)
+                     check2 <- any(regexpr(pattern = "radius",
+                                           text = formulas[[2]][[2]]) > 0)
+
+                     if(!check1){
+                       stop("Formula one must contain \'center\'
+                   in the dependent variable slot.")
+                     }
+                     if(!check2){
+                       stop("Formula two must contain \'radius\'
+                   in the dependent variable slot.")
+                     }
+
+                     x$center <- (intkrige::interval(x)[, 1] + intkrige::interval(x)[, 2]) / 2
+                     x$radius <- (intkrige::interval(x)[, 2] - intkrige::interval(x)[, 1]) / 2
+
+                     g1 <- gstat::gstat(NULL, "center", formula = formulas[[1]], data = x, ...)
+                     g2 <- gstat::gstat(g1, "radius", formula = formulas[[2]], data = x, ...)
+
+                     gv <- gstat::variogram(g2)
+
+                     # Have the intvariogram class inherit the original variogram class
+                     class(gv) <- c("intvariogram", class(gv))
+
+                     return(gv)
+                   }
+)
+
+#' Conversion from intsp to data frame.
+#'
+#' This function simply converts an intsp object to a SpatialPointsDataFrame
+#' object prior to calling as.data.frame.SpatialPointsDataFrame.
+#'
+#' @param x an object of class intsp
+#' @return an object of class data.frame
+#'
+#'
+#' @name as.data.frame
+#' @export
+methods::setMethod("as.data.frame", "intsp", function(x){
+  intkrige::interval(x) <- NULL
+  return(as.data.frame(x))
+})
+
+#' Create an interval plot for spatial points.
+#'
+#' Calls the sp::spplot() function to plot the locations, centers, and
+#' radii of an interval-valued spatial data frame in a single figure.
+#'
+#' @param x an object of class intsp
+#' @param locationsOnly a boolean: TRUE calls plot.sp(x)
+#' @param legend.positions the positions of the center and radius legend
+#' relative to the plotting window
+#' @param cuts the number of ranges of values to print in the center and radius
+#' legend respectively
+#' @param radSize a vector of length 2 indicating the range of point sizes to
+#' plot to visualize radii magnitudes
+#' @param pch the shape of the points (see plot())
+#' @param alpha the transparency of the points
+#' @param ... additional arguments to sp::spplot()
+#'
+#' @return a lattice plot object
+#'
+#' @method plot intsp
+#' @export
+plot.intsp <- function(x, locationsOnly = FALSE,
+                       legend.positions = c("left", "right"),
+                       cuts = c(5, 5), radSize = c(0.1, 3),
+                       pch = 16, alpha = 0.5,
+                       ...){
+  if(locationsOnly){
+    intkrige::interval(x) <- NULL
+    test <- plot(x, ...)
+    return(test)
+  }
+
+  if(length(legend.positions) != 2 || class(legend.positions) != "character"){
+    stop("two character legend positions must be provided")
+  }
+  if(length(cuts) != 2 || class(cuts) != "numeric"){
+    stop("two numeric cut arguments must be provided")
+  }
+  if(length(radSize) != 2 || class(radSize) != "numeric"){
+    stop("two numeric size arguments must be provided")
+  }
+  if(radSize[2] < radSize[1]){
+    stop("backwards range detected for radSize")
+  }
+
+  # First, compute the center and radius for the interval slot.
+  x$center <- (x@interval[, 1] + x@interval[, 2]) / 2
+  x$radius <- (x@interval[, 2] - x@interval[, 1]) / 2
+
+  # remove the interval slot and convert back to spatialpointsdataframe
+  intkrige::interval(x) <- NULL
+
+  # Determine the range of radius values.
+  radRange <- c(min(x$radius), max(x$radius))
+  radCuts <- cut(x$radius, cuts[2])
+
+  # Map the range of radius values to the range of cex values provided
+  # by the user.
+  x$weights <- (x$radius - radRange[1]) / (radRange[2] - radRange[1])
+  x$cex <- x$weights*radSize[1] + (1-x$weights)*radSize[2]
+
+  key.rad <- list(title="radius",
+                  points=list(pch=pch,
+                              cex = seq(radSize[1], radSize[2], length = cuts[2]),
+                              col="black"),
+                  text=list(levels(radCuts)),
+                  cex.title=1.25)
+
+  if(legend.positions[2] == "right"){
+    legend = list(right = list(fun = lattice::draw.key(key.rad)))
+  }else if(legend.positions[2] == "left"){
+    legend = list(left = list(fun = lattice::draw.key(key.rad)))
+  }else if(legend.positions[2] == "bottom"){
+    legend = list(bottom = list(fun = lattice::draw.key(key.rad)))
+  }else if(legend.positions[2] == "top"){
+    legend = list(top = list(fun = lattice::draw.key(key.rad)))
+  }else{
+    stop("invalid radius legend position supplied")
+  }
+
+  test <- sp::spplot(x, zcol = "pointDL",
+                     cex = x$cex,
+                     alpha = alpha, pch = pch,
+                     legend = legend,
+                     key.space = legend.positions[1],
+                     auto.key = list(title = "center"),
+                     cuts = cuts[1], ...)
+
+  # Change the size of the points in the center
+  # legend so they don't overplot
+  # http://r-sig-geo.2731867.n2.nabble.com/spplot-size-of-plotting-symbol-in-legend-td2762610.html
+  test$legend[[legend.positions[1]]]$args$key$points$cex <-
+    rep(1.5, length(test$legend[[legend.positions[1]]]$args$key$points$cex))
+
+
+  return(test)
 }
 #=============================================================================

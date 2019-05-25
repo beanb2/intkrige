@@ -1,3 +1,4 @@
+^betatesting\.R$
 ^data-raw$
 ^README\.Rmd$
 ^.*\.Rproj$

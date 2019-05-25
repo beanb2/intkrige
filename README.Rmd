@@ -51,7 +51,7 @@ with dataset documentation obtained by
 Descriptions for the source folders included in this package are as follows:
 
 - **data**: Includes a copy of the utsnow dataset.
-- **data-raw**: Includes the raw data files used to create utsnow as well as the scripts use to process the data. 
+- **data-raw**: Includes the source files used to create utsnow as well as the scripts use to process these data. 
 - **inst**: Includes a latex bibliography of citations used in the documentation.
 - **man**: Includes files used to render formatted function documentation R.
 - **R**: Functions and scripts used to execute the interval-valued kriging models. 
@@ -98,6 +98,7 @@ evgm <- gstat::variogram(g1)
 vsub1 <- evgm[evgm$id == "center", ]
 vsub2 <- evgm[evgm$id == "radius", ]
 vsub3 <- evgm[evgm$id == "center.radius", ]
+check <- gstat::vgm(model = c("Sph", "Sph", "Gau"))
 tvgm1 <- gstat::fit.variogram(vsub1, model = gstat::vgm("Sph"))
 tvgm2 <- gstat::fit.variogram(vsub2, model = gstat::vgm("Sph"))
 tvgm3 <- gstat::fit.variogram(vsub3, model = gstat::vgm("Gau"))

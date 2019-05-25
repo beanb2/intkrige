@@ -45,7 +45,7 @@
 #'  \describe{
 #'  \item{ID}{The global historical climatological network (GHCN)
 #'  station identifier}
-#'  \item{STATION_NAME}{The GHCN station name}
+#'  \item{NAME}{The GHCN station name}
 #'  \item{STATE}{The two-digit designation for the state in which each station resides}
 #'  \item{LATITUDE}{Latitude coordinate position}
 #'  \item{LONGITUDE}{Longitude coordinate position}
