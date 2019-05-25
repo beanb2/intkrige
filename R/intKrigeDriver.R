@@ -38,7 +38,7 @@
 #' ensure that the initial solution stays within the feasible region.
 #' @param useR If TRUE, use the R version of the algorithm.
 #' If FALSE, use the rcppArmadillo version.
-#' @param geographic If TRUE, use great circle distance calcuations.
+#' @param geographic If TRUE, use great circle distance calculations.
 #' If FALSE, use euclidean distances.
 #' @param fast (Simple kriging only). If TRUE, allows lambdas to converge to 0
 #' and subsets matrices accordingly. When FALSE, runs simple kriging using a

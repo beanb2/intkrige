@@ -12,7 +12,7 @@ dist_cpp(loc1, loc2, geographic)
 
 \item{loc2}{a two column matrix representing the longitude/latitude
 (i.e. x/y) coordinates of the second set of distances
-(for pairwise distnace matrix set loc1 = loc2).}
+(for pairwise distance matrix set loc1 = loc2).}
 
 \item{geographic}{If TRUE, calculate great circle distance. If FALSE, calculate
 Euclidean distance.}

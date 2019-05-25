@@ -6,27 +6,15 @@
 \alias{_PACKAGE}
 \title{intkrige package: Interval-valued kriging models in R.}
 \description{
-An interval valued extension of ordinary and simple kriging. 
-    Optimization of the function is based on a generalized interval distance. 
-    This creates a non-differentiable cost function that requires a 
-    differentiable approximation to the absolute value function. This 
-    differentiable appoximation is optimized using a Newton-Raphson algorithm
-    with a penalty function to impose the constraints. Covariances are 
-    specified using the vgm() object conventions in the gstat package. 
-    These functions use the gstat variogram conventions.
-}
-\section{Description}{
-
 An interval valued extension of ordinary and simple kriging.
-Optimization of the function is based on a generalized interval distance.
-This creates a non-differentiable cost function that requires a
-differentiable approximation to the absolute value function. This
-differentiable appoximation is optimized using a Newton-Raphson algorithm
-with a penalty function to impose the constraints.
-Covariances are specified using the \code{\link[gstat]{vgm}}
-object conventions.
+    Optimization of the function is based on a generalized interval distance.
+    This creates a non-differentiable cost function that requires a
+    differentiable approximation to the absolute value function. This
+    differentiable approximation is optimized using a Newton-Raphson algorithm
+    with a penalty function to impose the constraints.
+    Covariances are specified using the \code{\link[gstat]{vgm}}
+    object conventions.
 }
-
 \section{Functions}{
 
 \itemize{

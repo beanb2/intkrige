@@ -10,7 +10,7 @@
 #' (i.e. x/y) coordinates of the first set of distances.
 #' @param loc2 a two column matrix representing the longitude/latitude
 #' (i.e. x/y) coordinates of the second set of distances
-#' (for pairwise distnace matrix set loc1 = loc2).
+#' (for pairwise distance matrix set loc1 = loc2).
 #' @param geographic If TRUE, calculate great circle distance. If FALSE, calculate
 #'              Euclidean distance.
 #' @return Matrix of pairwise distances between each combination of rows from loc1

@@ -19,7 +19,7 @@ This package implements the interval-valued kriging models described in Bean et.
 
 ## Installation
 
-This is a preliminary version of the intkrige package. The final package will include additional user functions and visualization tools designed to simplify and enhance interval-valued spatial data analysis. This developmental version of the pacakge can be installed by setting the source file location to the parent folder and running the command
+This is a preliminary version of the intkrige package. The final package will include additional user functions and visualization tools designed to simplify and enhance interval-valued spatial data analysis. This developmental version of the package can be installed by setting the source file location to the parent folder and running the command
 
 ``` r
 devtools::install()
@@ -36,7 +36,7 @@ The current version of the package contains one main function named *intkrige*. 
 ```
 in the console. 
 
-The package also contains an interval-valued design ground snow load datset named *utsnow*. These data are available by installing the intkrige package and invoking the command
+The package also contains an interval-valued design ground snow load dataset named *utsnow*. These data are available by installing the intkrige package and invoking the command
 
 ```r
 data(utsnow)

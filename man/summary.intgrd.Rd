@@ -2,7 +2,7 @@
 % Please edit documentation in R/intgrd-class.R
 \name{summary.intgrd}
 \alias{summary.intgrd}
-\title{Sumarize the contents of an intgrd object, including special summaries for
+\title{Summarize the contents of an intgrd object, including special summaries for
 the interval slot.}
 \usage{
 \method{summary}{intgrd}(object, ...)
@@ -16,6 +16,6 @@ the interval slot.}
 nothing
 }
 \description{
-Sumarize the contents of an intgrd object, including special summaries for
+Summarize the contents of an intgrd object, including special summaries for
 the interval slot.
 }

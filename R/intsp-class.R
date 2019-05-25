@@ -12,18 +12,9 @@ NULL
 # coordinate, and interval slots when looking for a subset.
 # Adapted from:
 # - https://github.com/edzer/sp/blob/master/R/SpatialPoints-methods.R
-#' Atomic subset operator for intsp data
-#'
-#' This method extends the traditional \'$\' operator by also looking in the
-#' interval slot for the requested variable.
-#'
-#' @param x an object of class intsp
-#' @param name the variable name from which to subset
-#'
-#' @return a vector containing the requested data.
-#'
 #' @name $
-#' @export
+#' @rdname extract-methods
+#' @aliases $,intsp-method
 methods::setMethod("$", "intsp",
                    function(x, name) {
                      if (name %in% sp::coordnames(x))
@@ -40,19 +31,9 @@ methods::setMethod("$", "intsp",
 # using the standard "$" operator.
 # Adapted from:
 # - https://github.com/edzer/sp/blob/master/R/Spatial-methods.R
-#' Atomic assignment operator for intsp data
-#'
-#' This method extends the traditional \'$\' operator by also looking in the
-#' interval slot for the requested variable.
-#'
-#' @param x an object of class intsp
-#' @param name the variable name from which to subset
-#' @param value values to replace the current data in the variable
-#'
-#' @return a vector containing the requested data.
-#'
 #' @name $<-
-#' @export
+#' @rdname assign-methods
+#' @aliases $<-,intsp-method
 methods::setMethod("$<-", "intsp",
                    function(x, name, value) {
                      if (name %in% sp::coordnames(x))
@@ -75,27 +56,16 @@ methods::setMethod("$<-", "intsp",
 )
 
 # This method returns the interval slot.
-
-#' Create an intsp class object
-#'
-#' @param x an object of class intsp
-#' @return the interval slot of an intsp object
-#'
 #' @name interval
-#' @export
+#' @rdname interval-methods
+#' @aliases interval,intsp-method
 methods::setMethod("interval", "intsp", function(x) {
   return(x@interval)
 })
 
-# This method allows the user to define (or redefine) the
-# interval slot for an existing intsp object.
-#' Reassign values in the interval slot
-#'
-#' @param x an object of class intsp
-#' @return an object of class intsp with a reassigned interval slot
-#'
 #' @name interval<-
-#' @export
+#' @rdname interval-methods-assign
+#' @aliases interval<-,intsp-method
 methods::setMethod("interval<-", "intsp",
                    function(x, value) {
 
@@ -168,16 +138,9 @@ methods::setMethod("interval<-", "intsp",
                      }
                    })
 
-# This method allows a user to create an intsp object by
-# definining the interval slot. (Similar to sp::coordinates).
-#' Convert a SpatialPointsDataFrame object to an intsp object.
-#'
-#' @param x an object of class SpatialPointsDataFrame
-#' @return an object of class intsp
-#'
-#'
 #' @name interval<-
-#' @export
+#' @rdname interval-methods-assign
+#' @aliases interval<-,SpatialPointsDataFrame-method
 methods::setMethod("interval<-", "SpatialPointsDataFrame",
                    function(x, value) {
 
@@ -318,7 +281,7 @@ tail.intsp = function(x, n = 6, ..., digits = getOption("digits")) {
 
 # This method adapts the summary.spatial to include a covariance matrix
 # for the interval-center and radii in the output.
-#' Sumarize the contents of an intsp object, including special summaries for
+#' Summarize the contents of an intsp object, including special summaries for
 #' the interval slot.
 #'
 #' @param object an object of class intsp
@@ -388,67 +351,48 @@ print.summary.intsp = function(x, ...) {
   invisible(x)
 } # No "setMethod" as this directly calls intsp.
 
-#' Function to create a variogram object for interval-valued data.
-#' A wrapper to gstat::gstat() that fits all of the empirical variograms for
-#' the interval slot of an intsp object.
-#'
-#' @param x an object of class intsp
-#' @param forumas a list of length two specifying the equations for
-#' the center and radius. Changes from the default equation are only relevant
-#' if the user wants to center or scale the intervals according to another
-#' variable(s).
-#' @param ... additional arguments to gstat::gstat().
-#'
 #' @name intvariogram
-#' @export
+#' @rdname intvariogram-methods
+#' @aliases intvariogram,intsp-method
 methods::setMethod("intvariogram", "intsp",
                    function(x, formulas = list(center ~ 1, radius ~ 1), ...){
-                     # First ensure that the center and
-                     # radius are included in the proper formulas
-                     # (When strings are converted to strings, mathematical operators
-                     # act as a string split. Because we simply need "center" and
-                     # "radius" to appear somewhere in the text, we use the "any"
-                     # function to return one logical)
-                     check1 <- any(regexpr(pattern = "center",
-                                           text = formulas[[1]][[2]]) > 0)
-                     check2 <- any(regexpr(pattern = "radius",
-                                           text = formulas[[2]][[2]]) > 0)
+  # First ensure that the center and
+  # radius are included in the proper formulas
+  # (When strings are converted to strings, mathematical operators
+  # act as a string split. Because we simply need "center" and
+  # "radius" to appear somewhere in the text, we use the "any"
+  # function to return one logical)
+  check1 <- any(regexpr(pattern = "center",
+                        text = formulas[[1]][[2]]) > 0)
+  check2 <- any(regexpr(pattern = "radius",
+                        text = formulas[[2]][[2]]) > 0)
 
-                     if(!check1){
-                       stop("Formula one must contain \'center\'
-                   in the dependent variable slot.")
-                     }
-                     if(!check2){
-                       stop("Formula two must contain \'radius\'
-                   in the dependent variable slot.")
-                     }
+  if(!check1){
+    stop("Formula one must contain \'center\'
+         in the dependent variable slot.")
+  }
+  if(!check2){
+    stop("Formula two must contain \'radius\'
+         in the dependent variable slot.")
+  }
 
-                     x$center <- (intkrige::interval(x)[, 1] + intkrige::interval(x)[, 2]) / 2
-                     x$radius <- (intkrige::interval(x)[, 2] - intkrige::interval(x)[, 1]) / 2
+  x$center <- (intkrige::interval(x)[, 1] + intkrige::interval(x)[, 2]) / 2
+  x$radius <- (intkrige::interval(x)[, 2] - intkrige::interval(x)[, 1]) / 2
 
-                     g1 <- gstat::gstat(NULL, "center", formula = formulas[[1]], data = x, ...)
-                     g2 <- gstat::gstat(g1, "radius", formula = formulas[[2]], data = x, ...)
+  g1 <- gstat::gstat(NULL, "center", formula = formulas[[1]], data = x, ...)
+  g2 <- gstat::gstat(g1, "radius", formula = formulas[[2]], data = x, ...)
 
-                     gv <- gstat::variogram(g2)
+  gv <- gstat::variogram(g2)
 
-                     # Have the intvariogram class inherit the original variogram class
-                     class(gv) <- c("intvariogram", class(gv))
+  # Have the intvariogram class inherit the original variogram class
+  class(gv) <- c("intvariogram", class(gv))
 
-                     return(gv)
-                   }
-)
+  return(gv)
+  })
 
-#' Conversion from intsp to data frame.
-#'
-#' This function simply converts an intsp object to a SpatialPointsDataFrame
-#' object prior to calling as.data.frame.SpatialPointsDataFrame.
-#'
-#' @param x an object of class intsp
-#' @return an object of class data.frame
-#'
-#'
 #' @name as.data.frame
-#' @export
+#' @rdname interval.as.data.frame-methods
+#' @aliases as.data.frame,intsp-method
 methods::setMethod("as.data.frame", "intsp", function(x){
   intkrige::interval(x) <- NULL
   return(as.data.frame(x))

@@ -8,7 +8,7 @@ This package implements the interval-valued kriging models described in Bean et.
 Installation
 ------------
 
-This is a preliminary version of the intkrige package. The final package will include additional user functions and visualization tools designed to simplify and enhance interval-valued spatial data analysis. This developmental version of the pacakge can be installed by setting the source file location to the parent folder and running the command
+This is a preliminary version of the intkrige package. The final package will include additional user functions and visualization tools designed to simplify and enhance interval-valued spatial data analysis. This developmental version of the package can be installed by setting the source file location to the parent folder and running the command
 
 ``` r
 devtools::install()
@@ -27,7 +27,7 @@ The current version of the package contains one main function named *intkrige*. 
 
 in the console.
 
-The package also contains an interval-valued design ground snow load datset named *utsnow*. These data are available by installing the intkrige package and invoking the command
+The package also contains an interval-valued design ground snow load dataset named *utsnow*. These data are available by installing the intkrige package and invoking the command
 
 ``` r
 data(utsnow)
@@ -42,7 +42,7 @@ with dataset documentation obtained by
 Descriptions for the source folders included in this package are as follows:
 
 -   **data**: Includes a copy of the utsnow dataset.
--   **data-raw**: Includes the raw data files used to create utsnow as well as the scripts use to process the data.
+-   **data-raw**: Includes the source files used to create utsnow as well as the scripts use to process these data.
 -   **inst**: Includes a latex bibliography of citations used in the documentation.
 -   **man**: Includes files used to render formatted function documentation R.
 -   **R**: Functions and scripts used to execute the interval-valued kriging models.
@@ -89,6 +89,7 @@ evgm <- gstat::variogram(g1)
 vsub1 <- evgm[evgm$id == "center", ]
 vsub2 <- evgm[evgm$id == "radius", ]
 vsub3 <- evgm[evgm$id == "center.radius", ]
+check <- gstat::vgm(model = c("Sph", "Sph", "Gau"))
 tvgm1 <- gstat::fit.variogram(vsub1, model = gstat::vgm("Sph"))
 tvgm2 <- gstat::fit.variogram(vsub2, model = gstat::vgm("Sph"))
 tvgm3 <- gstat::fit.variogram(vsub3, model = gstat::vgm("Gau"))

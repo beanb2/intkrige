@@ -2,7 +2,7 @@
 % Please edit documentation in R/intsp-class.R
 \name{summary.intsp}
 \alias{summary.intsp}
-\title{Sumarize the contents of an intsp object, including special summaries for
+\title{Summarize the contents of an intsp object, including special summaries for
 the interval slot.}
 \usage{
 \method{summary}{intsp}(object, ...)
@@ -16,6 +16,6 @@ the interval slot.}
 nothing
 }
 \description{
-Sumarize the contents of an intsp object, including special summaries for
+Summarize the contents of an intsp object, including special summaries for
 the interval slot.
 }
