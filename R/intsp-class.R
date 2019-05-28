@@ -398,28 +398,11 @@ methods::setMethod("as.data.frame", "intsp", function(x){
   return(as.data.frame(x))
 })
 
-#' Create an interval plot for spatial points.
-#'
-#' Calls the sp::spplot() function to plot the locations, centers, and
-#' radii of an interval-valued spatial data frame in a single figure.
-#'
-#' @param x an object of class intsp
-#' @param locationsOnly a boolean: TRUE calls plot.sp(x)
-#' @param legend.positions the positions of the center and radius legend
-#' relative to the plotting window
-#' @param cuts the number of ranges of values to print in the center and radius
-#' legend respectively
-#' @param radSize a vector of length 2 indicating the range of point sizes to
-#' plot to visualize radii magnitudes
-#' @param pch the shape of the points (see plot())
-#' @param alpha the transparency of the points
-#' @param ... additional arguments to sp::spplot()
-#'
-#' @return a lattice plot object
-#'
-#' @method plot intsp
-#' @export
-plot.intsp <- function(x, locationsOnly = FALSE,
+#' @name plot
+#' @rdname plot.interval-methods
+#' @aliases plot,intsp-method
+methods::setMethod("plot", signature = c("intsp", "missing"),
+                  function(x, locationsOnly = FALSE,
                        legend.positions = c("left", "right"),
                        cuts = c(5, 5), radSize = c(0.1, 3),
                        pch = 16, alpha = 0.5,
@@ -494,5 +477,5 @@ plot.intsp <- function(x, locationsOnly = FALSE,
 
 
   return(test)
-}
+})
 #=============================================================================

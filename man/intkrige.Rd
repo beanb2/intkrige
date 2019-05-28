@@ -4,29 +4,26 @@
 \alias{intkrige}
 \title{Algorithmic implementation of interval valued kriging.}
 \usage{
-intkrige(locations, measurements, newdata, modelC, modelR,
-  modelCR = NULL, eta = 0.75, A = c(1, 1, 0), trend = NULL,
-  thresh = 100, tolq = 0.001, maxq = 100, tolp = 0.001,
-  maxp = 100, r = 1, useR = TRUE, geographic = FALSE,
-  fast = FALSE, weights = FALSE, cores = 1)
+intkrige(locations, newdata, models, formulas = list(center ~ 1, radius ~
+  1), eta = 0.75, A = c(1, 1, 0), trend = NULL, thresh = 100,
+  tolq = 0.001, maxq = 100, tolp = 0.001, maxp = 100, r = 1,
+  useR = TRUE, fast = FALSE, weights = FALSE, cores = 1)
 }
 \arguments{
-\item{locations}{A two column matrix containing the x/y
-(longitude/latitude) coordinates of the input data.}
+\item{locations}{An object of class intsp, specifying the prediction
+locations with an interval-valued response.}
 
-\item{measurements}{A two column matrix containing the center/radius
-measurements corresponding to the input locations.}
+\item{newdata}{An object of class SpatialPointsDataFrame or
+SpatialPixelsDataFrame specifying the locations at which to predict
+intervals.}
 
-\item{newdata}{A two column matrix containing the x/y
-(longitude/latitude) coordinates of the prediction locations.}
+\item{models}{a list of variogram models of class vgm (see \link[gstat]{vgm})
+When specified, the third model represents vgm model
+for the center/radius interaction.}
 
-\item{modelC}{variogram model of class vgm (see \link[gstat]{vgm})
-for the centers of the intervals}
-
-\item{modelR}{variogram model of class vgm for radii}
-
-\item{modelCR}{If NULL, assume no interaction between center and radius.
-When specified, represents vgm model for the center/radius interaction.}
+\item{formulas}{a list of two formulas specifying the centering and scaling
+of the center and radius respectively. Note the limitations to these
+forumlas as specified in the details.}
 
 \item{eta}{growth/shrink parameter for penalty term.
 For simple kriging: eta > 1. For ordinary kriging eta < 1.}
@@ -60,9 +57,6 @@ ensure that the initial solution stays within the feasible region.}
 \item{useR}{If TRUE, use the R version of the algorithm.
 If FALSE, use the rcppArmadillo version.}
 
-\item{geographic}{If TRUE, use great circle distance calculations.
-If FALSE, use euclidean distances.}
-
 \item{fast}{(Simple kriging only). If TRUE, allows lambdas to converge to 0
 and subsets matrices accordingly. When FALSE, runs simple kriging using a
 barrier penalty at 0. Fast = TRUE is orders of maginitude faster than the
@@ -82,7 +76,7 @@ Note there is no parallel option when useR = FALSE.}
 }
 \value{
 A matrix with 4 columns where rows correspond to the prediction
-locations and columns correspond to:
+ locations and columns correspond to:
 
 - center prediction
 
@@ -98,4 +92,19 @@ Function to implement the interval valued extension of ordinary and
 simple kriging. Includes all necessary input checks and error handling.
 Essentially acts as a switch function between the R and c++ versions
 of the algorithm.
+}
+\details{
+The formulas argument is current fairly limited in its use. For example
+ the center argument can accept no transformations of the dependent
+ variable. Similarly, the radius argument can accept no variable arguments
+ as independent variables. The idea behind this limited use of formulas is
+ that any transformations should be applied to the entire interval prior
+ to input into interval-valued kriging. This ensures that input into the
+ interval-valued kriging algorithm are well-defined intervals with
+ properly ordered upper and lower endpoints. The transformation that
+ are allowed within this function are linear shifts of the center, and
+ linear scalings of the radius.
+ Note that the scaling term for the radius can contain a division parameter
+ but it must be encapsulated in parenthesis and included on the right hand
+ side of the multiplication parameter.
 }

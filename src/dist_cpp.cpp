@@ -30,6 +30,10 @@
 //' data(utsnow)
 //' locs1 <- as.matrix(utsnow[, c("LONGITUDE", "LATITUDE")])
 //' distMat <- dist_cpp(locs1, locs1, geographic = TRUE)
+//' @details
+//' Note that while this function is still available to users. It is not actively used
+//'  in the intkrige function. Instead, for user convienence, distances are calculated
+//'  usingdistance functions in the sp package.
 //' @export
 // [[Rcpp::export]]
 arma::mat dist_cpp(const arma::mat & loc1, const arma::mat & loc2,

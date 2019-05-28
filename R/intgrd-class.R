@@ -398,33 +398,24 @@ methods::setMethod("as.data.frame", "intgrd", function(x){
 })
 
 
-#' Create an interval plot for spatial points.
-#'
-#' Calls the sp::spplot() function to plot the locations, centers, and
-#' radii of an interval-valued spatial data frame in a single figure.
-#'
-#' @param x an object of class intsp
-#' @param locationsOnly a boolean: TRUE calls plot.sp(x)
-#' @param legend.positions the positions of the center and radius legend
-#' relative to the plotting window
-#' @param cuts the number of ranges of values to print in the center and radius
-#' legend respectively
-#' @param radSize a vector of length 2 indicating the range of point sizes to
-#' plot to visualize radii magnitudes
-#' @param pch the shape of the points (see plot())
-#' @param alpha the transparency of the points
-#' @param ... additional arguments to sp::spplot()
-#'
-#' @return a lattice plot object
-#'
-#' @method plot intgrd
-#' @noRd
-plot.intgrd <- function(x, beside = TRUE, legend.positions = c("right", "right"),
-                        ...){
+#' @name plot
+#' @rdname plot.interval-methods
+#' @aliases plot,intgrd-method
+methods::setMethod("plot",
+                   signature = c("intgrd", "missing"),
+                   function(x, beside = TRUE, circleCol = "black", ...){
 
-  if(beside){
-    pc <- sp::spplot()
-    gridExtra::grid.arrange()
-  }
 
-}
+                     x$center <- (interval(x)[, 1] + interval(x)[, 2]) / 2
+                     x$radius <- (interval(x)[, 2] - interval(x)[, 1]) / 2
+
+                     if(beside){
+                       pc <- sp::spplot(x, zcol = "center", main = "center", ...)
+                       pr <- sp::spplot(x, zcol = "radius", main = "radius", ...)
+                       return(gridExtra::grid.arrange(pc, pr, ncol = 2))
+                     }else{
+                       return(NULL)
+                     }
+
+                   }
+)

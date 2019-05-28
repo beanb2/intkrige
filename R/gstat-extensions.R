@@ -62,8 +62,8 @@ intvCheck <- function(x, models, ...){
   }else{
     p3 <- plot(x[x$id == "center.radius", ])
   }
-  gridExtra::grid.arrange(p1, p2, p3, nrow = 2, ncol = 2)
-  return(NULL)
+
+  return(gridExtra::grid.arrange(p1, p2, p3, nrow = 2, ncol = 2))
 }
 
 

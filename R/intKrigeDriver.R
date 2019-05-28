@@ -5,57 +5,55 @@
 #' Essentially acts as a switch function between the R and c++ versions
 #' of the algorithm.
 #'
-#' @param locations A two column matrix containing the x/y
-#' (longitude/latitude) coordinates of the input data.
-#' @param measurements A two column matrix containing the center/radius
-#' measurements corresponding to the input locations.
-#' @param newdata A two column matrix containing the x/y
-#' (longitude/latitude) coordinates of the prediction locations.
-#' @param modelC variogram model of class vgm (see \link[gstat]{vgm})
-#' for the centers of the intervals
-#' @param modelR variogram model of class vgm for radii
-#' @param modelCR If NULL, assume no interaction between center and radius.
-#' When specified, represents vgm model for the center/radius interaction.
+#' @param locations An object of class intsp, specifying the prediction
+#'  locations with an interval-valued response.
+#' @param newdata An object of class SpatialPointsDataFrame or
+#'  SpatialPixelsDataFrame specifying the locations at which to predict
+#'  intervals.
+#' @param models a list of variogram models of class vgm (see \link[gstat]{vgm})
+#'  When specified, the third model represents vgm model
+#'  for the center/radius interaction.
+#' @param formulas a list of two formulas specifying the centering and scaling
+#'  of the center and radius respectively. Note the limitations to these
+#'  forumlas as specified in the details.
 #' @param eta growth/shrink parameter for penalty term.
-#' For simple kriging: eta > 1. For ordinary kriging eta < 1.
+#'  For simple kriging: eta > 1. For ordinary kriging eta < 1.
 #' @param A vector of length three representing the weights
-#' of the generalized L2 distance: the vector of three contains the weights for
-#' the center, radius, and center/radius respectively.
-#' A = c(1, 1, 0) assumes the regular L2 distance calculation for intervals.
+#'  of the generalized L2 distance: the vector of three contains the weights for
+#'  the center, radius, and center/radius respectively.
+#'  A = c(1, 1, 0) assumes the regular L2 distance calculation for intervals.
 #' @param trend If null, use ordinary kriging. When specified, represents the
-#' known mean of the stationary process, an indication to use simple kriging.
+#'  known mean of the stationary process, an indication to use simple kriging.
 #' @param thresh Let n = length(locations). When abs(lam_i) < 1/(n*thresh),
-#' this lambda value is set to 0.
+#'  this lambda value is set to 0.
 #' @param tolq For a set penalty term, convergence is satisfied if
-#' max(abs(lamUp-lam)) < tolq.
+#'  max(abs(lamUp-lam)) < tolq.
 #' @param maxq For a set penalty term, max number of iterations
-#' allowed for convergence.
+#'  allowed for convergence.
 #' @param tolp When abs(sum(abs(lam)) - 1) < tolp, consider the
-#' constraints satisfied.
+#'  constraints satisfied.
 #' @param maxp Maximum number of allowed iterations to satisfy
-#' equation constraints.
+#'  equation constraints.
 #' @param r The starting value of the penalty term. Must be relatively large to
-#' ensure that the initial solution stays within the feasible region.
+#'  ensure that the initial solution stays within the feasible region.
 #' @param useR If TRUE, use the R version of the algorithm.
-#' If FALSE, use the rcppArmadillo version.
-#' @param geographic If TRUE, use great circle distance calculations.
-#' If FALSE, use euclidean distances.
+#'  If FALSE, use the rcppArmadillo version.
 #' @param fast (Simple kriging only). If TRUE, allows lambdas to converge to 0
-#' and subsets matrices accordingly. When FALSE, runs simple kriging using a
-#' barrier penalty at 0. Fast = TRUE is orders of maginitude faster than the
-#' full implementation. However, it is not recommended when input measurements
-#' are sparse as it is known to have convergence issues in these cases.
+#'  and subsets matrices accordingly. When FALSE, runs simple kriging using a
+#'  barrier penalty at 0. Fast = TRUE is orders of maginitude faster than the
+#'  full implementation. However, it is not recommended when input measurements
+#'  are sparse as it is known to have convergence issues in these cases.
 #' @param weights If TRUE, return the vector kriging weights for each prediction.
-#' If false, simply return the predicted output.
+#'  If false, simply return the predicted output.
 #' @param cores An integer (for parallel computing): specify the number
-#' of cores that will be devoted to the computation.
-#' Note that the argument 'all' will
-#' use all available cores minus one.
-#' Parallel processing is only relevant if you are predicting
-#' for more than one location.
-#' Note there is no parallel option when useR = FALSE.
+#'  of cores that will be devoted to the computation.
+#'  Note that the argument 'all' will
+#'  use all available cores minus one.
+#'  Parallel processing is only relevant if you are predicting
+#'  for more than one location.
+#'  Note there is no parallel option when useR = FALSE.
 #' @return A matrix with 4 columns where rows correspond to the prediction
-#' locations and columns correspond to:
+#'  locations and columns correspond to:
 #'
 #' - center prediction
 #'
@@ -66,20 +64,53 @@
 #' - warning column for non-convergent optimization problem
 #' (0 - no warning, 1 - warning)
 #'
+#' @details
+#' The formulas argument is current fairly limited in its use. For example
+#'  the center argument can accept no transformations of the dependent
+#'  variable. Similarly, the radius argument can accept no variable arguments
+#'  as independent variables. The idea behind this limited use of formulas is
+#'  that any transformations should be applied to the entire interval prior
+#'  to input into interval-valued kriging. This ensures that input into the
+#'  interval-valued kriging algorithm are well-defined intervals with
+#'  properly ordered upper and lower endpoints. The transformation that
+#'  are allowed within this function are linear shifts of the center, and
+#'  linear scalings of the radius.
+#'  Note that the scaling term for the radius can contain a division parameter
+#'  but it must be encapsulated in parenthesis and included on the right hand
+#'  side of the multiplication parameter.
 #' @useDynLib intkrige, .registration = TRUE
 #' @importFrom Rcpp evalCpp
 #'
 #' @export
 # TODO: Examples.
-intkrige <- function(locations, measurements, newdata,
-                     modelC, modelR, modelCR = NULL,
+intkrige <- function(locations, newdata, models,
+                     formulas = list(center ~ 1, radius ~ 1),
                      eta = 0.75, A = c(1, 1, 0), trend = NULL,
                      thresh = 100, tolq = .001, maxq = 100,
                      tolp = .001, maxp = 100, r = 1, useR = TRUE,
-                     geographic = FALSE, fast = FALSE, weights = FALSE,
+                     fast = FALSE, weights = FALSE,
                      cores = 1){
 
-  ### Error checks
+  ### Error checks for for spatial objects
+  #===========================================================================
+  if(class(locations) != "intsp"){
+    stop("locations must be of class intsp")
+  }
+  if(class(newdata) != "SpatialPointsDataFrame" &&
+     class(newdata) != "SpatialPixelsDataFrame"){
+    stop("newdata must be of class SpatialPointsDataFrame or
+         SpatialPixelsDataFrame")
+  }
+  if(class(models) != "list" || length(models) < 2 || length(models) > 3){
+    stop("models must be a list of 2-3 variograms")
+  }
+  if(class(models[[1]])[1] != "variogramModel" || class(models[[2]])[1] != "variogramModel"){
+    stop("Variogram models must all be of class variogramModel
+         (see gstat package documentation.")
+  }
+  #===========================================================================
+
+  ### Error checks for optimization parameters
   #===========================================================================
   if(thresh < 5 || maxq < 5){
     warning("Very low thresh or maxq parameter has been specified.\n
@@ -100,18 +131,6 @@ intkrige <- function(locations, measurements, newdata,
            exceed the weight of the individual components.")
     }
   }
-  if(class(locations) != "matrix" || class(newdata) != "matrix" ||
-     class(measurements) != "matrix"){
-    stop("locations, newdata, and measurements must all be matrices.")
-  }else{
-    if(nrow(locations) != nrow(measurements)){
-      stop("Number of locations must match the number of
-           measurements exactly.")
-    }
-    if(ncol(locations) != 2 || ncol(newdata) != 2 || ncol(measurements) != 2)
-      stop("locations, newdata, and measurements inputs must all
-           have precisely 2 columns.")
-  }
   if(tolp > .01 || tolq > .01){
     warning("At least one large tolerance criterion detected. Consider using\n
             smaller tolerance parameters.")
@@ -119,20 +138,6 @@ intkrige <- function(locations, measurements, newdata,
     if(tolp <= 0 || tolq <=0){
       stop("Tolerance parameters must be strictly positive.")
     }
-  }
-  if(class(modelC)[1] != "variogramModel" || class(modelR)[1] != "variogramModel"){
-    stop("Variogram models must all be of class variogramModel
-         (see gstat package documentation.")
-  }
-  if(is.null(trend) && fast){
-    warning("Fast specification only relevant for simple kriging,
-            which requires the trend to be specified.\n
-            Fast = TRUE is ignored.")
-  }
-  if(class(useR) != "logical" || class(geographic) != "logical" ||
-     class(fast) != "logical" || class(weights) != "logical"){
-    stop("Variables useR, geographic, fast, and weights must all
-         be of class \'logical\'")
   }
   if(class(cores) == "character"){
     if(cores != "all"){
@@ -154,54 +159,107 @@ intkrige <- function(locations, measurements, newdata,
   }
   #===========================================================================
 
-  # Prepare the necessary prediction matrices.
-  # Figure out distances between sample sites and prediction sites
-  # Make sure unprojected coordinates are relevant.
-  if(geographic && (min(locations[, 1], newdata[, 1]) < -180 ||
-                    max(locations[, 1], newdata[, 1]) > 180 ||
-                    min(locations[, 2], newdata[, 2]) < -90 ||
-                    max(locations[, 2], newdata[, 2]) > 90)){
-    stop("Invalid geographic coordinates detected. Please ensure that\n
-           -90 < Latitude < 90 and -180 < Longitude < 180.")
+  ### Formula Checks
+  #===========================================================================
+  # Check for the center formula:
+  if(as.character(formulas[[1]][[2]]) != "center"){
+    stop("no transformations currently accepted for center formula/n
+         changes can only be made to independent variables")
   }
+  if(as.character(formulas[[2]][[3]]) != "1"){
+    stop("independent variables not currently accepted for radius forula\n
+         please leave right hand side of equation equal to 1")
+  }
+  if(length(formulas[[2]][[2]]) > 1){
+    if(length(formulas[[2]][[2]]) > 3){
+      stop("formula for radius can currently only accept one scaling argument")
+    }
+    if(as.character(formulas[[2]][[2]][[1]]) != "*"){
+      stop("currently only multiplication-based scalings are allowed")
+    }
+    if(as.character(formulas[[2]][[2]][[2]]) != "radius"){
+      stop("first argument of the dependent variable in the radius equation
+           must be the value \'radius\'")
+    }
+  }else{
+    if(as.character(formulas[[2]][[2]]) != "radius"){
+      stop("unless multiplication scaling is specified, dependent variable in
+           radius argument must be simply equal to \'radius\'")
+    }
+  }
+  #===========================================================================
 
-  pwDist <- dist_cpp(locations, locations, geographic)
-  loiDist <- dist_cpp(locations, newdata, geographic)
+  ### Other checks
+  #===========================================================================
+  if(is.null(trend) && fast){
+    warning("Fast specification only relevant for simple kriging,
+            which requires the trend to be specified.\n
+            Fast = TRUE is ignored.")
+  }
+  if(class(useR) != "logical" || class(fast) != "logical" ||
+     class(weights) != "logical"){
+    stop("Variables useR, fast, and weights must all
+         be of class \'logical\'")
+  }
+  #===========================================================================
+  # Add centers and radii to data columns
+  locations$center <- (interval(locations)[, 1] + interval(locations)[, 2]) / 2
+  locations$radius <- (interval(locations)[, 2] - interval(locations)[, 1]) / 2
+
+  # Prepare the necessary prediction matrices.
+  # dist_cpp is twice as fast as spDists() but the speedup is not worth the
+  # increased complexity for the user.
+  pwDist <- sp::spDists(locations)
+  loiDist <- sp::spDists(locations, newdata)
 
   # Ensure the diagonals of the pairwise matrix are exactly equal to 0.
+  # (To avoid numerical precision errors).
   for(i in 1:nrow(pwDist)){
     pwDist[i, i] <- 0
   }
 
-  pCovC <- gstat::variogramLine(modelC, dist_vector = pwDist,
-                                covariance = TRUE)
-  pCovR <- gstat::variogramLine(modelR, dist_vector = pwDist,
-                                covariance = TRUE)
-
-  lCovC <- gstat::variogramLine(modelC, dist_vector = loiDist,
-                                covariance = TRUE)
-  lCovR <- gstat::variogramLine(modelR, dist_vector = loiDist,
-                                covariance = TRUE)
-
-  if(!is.null(modelCR)){
-    if(class(modelCR)[1] != "variogramModel"){
-      stop("modelCR must be of class variogramModel
-           (see gstat package for details).")
-    }
-    pCovCR <- gstat::variogramLine(modelCR, dist_vector =  pwDist,
-                                   covariance = TRUE)
-    lCovCR <- gstat::variogramLine(modelCR, dist_vector = loiDist,
-                                   covariance = TRUE)
-  }else{
-    if(A[3] != 0){
-      warning("Non zero center/radius interaction specified in A with
-              no model provided.\nA[3] will be set to 0...")
-      A[3] <- 0
-    }
-    # Make a copy of the radius covariance as a placeholder.
-    pCovCR <- pCovR
-    lCovCR <- lCovR
+  # Determine covariance calculations for all variogram models specified.
+  pCov <- lCov <- vector("list", length(models))
+  for (i in 1:length(models)){
+    pCov[[i]] <- gstat::variogramLine(models[[i]], dist_vector = pwDist,
+                                      covariance = TRUE)
+    lCov[[i]] <- gstat::variogramLine(models[[i]], dist_vector = loiDist,
+                                      covariance = TRUE)
   }
+
+  pCovC <- pCov[[1]]
+  pCovR <- pCov[[2]]
+
+  lCovC <- lCov[[1]]
+  lCovR <- lCov[[2]]
+
+  # Determine if the interaction term needs
+  if(length(pCov) > 2){
+    pCovCR <- pCov[[3]]
+    lCovCR <- lCov[[3]]
+  }else{
+    # create matrices of 0 values for placeholders
+    pCovCR <- matrix(0, nrow = nrow(pCovC), ncol = ncol(pCovC))
+    lCovCR <- matrix(0, nrow = nrow(lCovC), ncol = ncol(lCovC))
+  }
+  # Remove any linear trends in the interval data.
+  if(as.character(formulas[[1]][[3]]) != "1"){
+    templm <- stats::lm(formulas[[1]], data = as.data.frame(locations))
+    center_inputs <- templm$residuals
+  }else{
+    center_inputs <- locations$center
+  }
+
+  # Scale radii as requested.
+  if(length(formulas[[2]][[2]]) > 1){
+    temp_model <- stats::model.frame(formulas[[2]], data = locations)
+    radius_inputs <- temp_model[, 1]
+  }else{
+    radius_inputs <- locations$radius
+  }
+
+  measurements <- matrix(c(center_inputs, radius_inputs),
+                         ncol = 2, byrow = FALSE)
 
   # Prepare the inputs.
   if(useR){
@@ -236,5 +294,54 @@ intkrige <- function(locations, measurements, newdata,
                         maxp, eta, r, trend2, fast)
   }
 
-  return(predicts)
+  # If weights=TRUE, only deal with the predicted data.
+  if(weights){
+    temp_predicts <- predicts[[1]]
+  }else{
+    temp_predicts <- predicts
+  }
+
+  # add raw prediction information to the measurement data frame
+  newdata$center <- temp_predicts[, 1]
+  newdata$radius <- temp_predicts[, 2]
+  newdata$kriging_variance <- temp_predicts[, 3]
+  newdata$warn <- temp_predicts[, 4]
+
+  # Transform back to original units and fill the interval slot.
+  if(as.character(formulas[[1]][[3]]) != "1"){
+    temp_predicts <- stats::predict(templm, newdata = as.data.frame(newdata))
+    center_final <- temp_predicts + newdata$center
+  }else{
+    center_final <- newdata$center
+  }
+
+  # Undo radii scaling
+  if(length(formulas[[2]][[2]]) > 1){
+    # Extract the component we want to reverse.
+    # The use of length(temp_component) in the following lines
+    # accomodates the fact that the formula is split in two
+    # if parenthesis are present.
+    temp_component <- as.character(formulas[[2]][[2]][[3]])
+    temp_predicts <-
+      stats::model.frame(
+        stats::as.formula(paste("radius/(",
+                                temp_component[length(temp_component)],
+                                ")~1")), data = newdata)
+    radius_final <- temp_predicts[, 1]
+  }else{
+    radius_final <- newdata$radius
+  }
+
+  # Create interval-valued spatial object
+  newdata$lower <- center_final - radius_final
+  newdata$upper <- center_final + radius_final
+  interval(newdata) <- c("lower", "upper")
+
+  # Return the appended newdata spatial object
+  if(weights){
+    return(list(newdata, predicts[[2]]))
+  }else{
+    return(newdata)
+  }
 }
+

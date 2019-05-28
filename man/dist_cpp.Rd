@@ -26,6 +26,11 @@ Calculation of euclidean or geograhic distance. Based on an adaptation of
 rdist.earth in the fields package. Uses earth radius = 6378.388 for
 great circle distance calculations.
 }
+\details{
+Note that while this function is still available to users. It is not actively used
+ in the intkrige function. Instead, for user convienence, distances are calculated
+ usingdistance functions in the sp package.
+}
 \examples{
 data(utsnow)
 locs1 <- as.matrix(utsnow[, c("LONGITUDE", "LATITUDE")])

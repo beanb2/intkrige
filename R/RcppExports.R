@@ -19,6 +19,10 @@
 #' data(utsnow)
 #' locs1 <- as.matrix(utsnow[, c("LONGITUDE", "LATITUDE")])
 #' distMat <- dist_cpp(locs1, locs1, geographic = TRUE)
+#' @details
+#' Note that while this function is still available to users. It is not actively used
+#'  in the intkrige function. Instead, for user convienence, distances are calculated
+#'  usingdistance functions in the sp package.
 #' @export
 dist_cpp <- function(loc1, loc2, geographic) {
     .Call(`_intkrige_dist_cpp`, loc1, loc2, geographic)

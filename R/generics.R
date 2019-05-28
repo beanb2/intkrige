@@ -93,3 +93,31 @@ NULL
 #' @name as.data.frame
 #' @rdname interval.as.data.frame-methods
 NULL
+
+#' Create an interval plot for spatial points.
+#'
+#' Calls the sp::spplot() function to plot the locations, centers, and
+#' radii of an interval-valued spatial data frame in a single figure.
+#'
+#' @param x an object of class intsp or intgrd
+#' @param beside (intgrd only) if true, center and radius plotted side by side
+#'  if false, center and radius are plotted in a single figure with the center
+#'  plotted using color and the radius plotted using circles circumsribed
+#'  within each grid cell.
+#' @param circleCol (intgrdonly) if beside=TRUE, the color of the circles
+#'  that will be circumscribed within each grid cell
+#' @param locationsOnly a boolean: TRUE calls plot.sp(x)
+#' @param legend.positions the positions of the center and radius legend
+#' relative to the plotting window
+#' @param cuts the number of ranges of values to print in the center and radius
+#' legend respectively
+#' @param radSize a vector of length 2 indicating the range of point sizes to
+#' plot to visualize radii magnitudes
+#' @param pch the shape of the points (see plot())
+#' @param alpha the transparency of the points
+#' @param ... additional arguments to sp::spplot()
+#'
+#' @name plot
+#' @rdname plot.interval-methods
+NULL
+

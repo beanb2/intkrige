@@ -58,71 +58,78 @@ Descriptions for the source folders included in this package are as follows:
 - **src**: c++ version of the interval-valued kriging models created using Rcpp and RcppArmadillo [@rcpp-a; @rcpp; @rcpp2; @rcpp3].
 
 
-## Example
+## Intro
 
-Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. [@Bean2019-int]. The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah. This example makes use of several existing resources available in the gstat and sp packages [@gstat1; @gstat2; @Bivand2008]. 
+Once installed, this package runs simple and ordinary interval-valued kriging models. The following example comes from the design ground snow load application described in Bean et. al. [@Bean2019-int]. The snow load problem requires a proper consideration of the effect of elevation on ground snow loads prior to input into kriging. The current interval-valued kriging models allow for linear considerations of secondary variables in the model predictions. Such models are akin to "kriging with an external drift" [@Goovaerts1997] or "simple kriging with varying local means" [@Goovaerts2000].
 
-```{r example}
+The example shows how to make an interval valued kriging design ground snow load prediction (after removing the effect of elevation) for Logan, Utah. Many of the functions in the following examples are wrappers to functions in the gstat and sp packages [@gstat1; @gstat2; @Bivand2008]. 
+
+## Defining Classes and Variograms
+The intkrige package relies on interval-valued spatial objects. These objects are named "intsp" and "intgrd" respectively. "intsp" inherits directly from "SpatialPointsDataFrame" objects in the sp class, while "intgrd" inherits from "SpatialPixelsDataFrames". These class extensions are created using the interval() function as demonstrated below.
+
+```{r objectCreate}
+library(intkrige)
+
 # First, define the location and elevation of interest. 
 # (In this case we pick coordinates of Utah State University)
-lats <- c(41.745)
-lons <- c(111.810)
-elevation <- c(1456)
+templocs <- data.frame(lat = 41.745, long = -111.810, ELEVATION = 1456)
+sp::coordinates(templocs) <- c("long", "lat")
+sp::proj4string(templocs) <- "+proj=longlat +ellps=WGS84
+                              +datum=WGS84 +no_defs +towgs84=0,0,0"
 
 # Load the Utah Snow Load Data
 data(utsnow)
-
-# Determine the centers and radii on a log scale.
-utsnow$center = (log(utsnow$maxDL) + log(utsnow$minDL)) / 2
-utsnow$radius = (log(utsnow$maxDL) - log(utsnow$minDL)) / 2
-
-# Scale the interval centers and radii
-cLM <- lm(center ~ ELEVATION, data = utsnow)
-utsnow$rC <- cLM$residuals
-utsnow$rR <- utsnow$radius*(utsnow$ELEVATION/median(utsnow$ELEVATION))
-
-# Extract the variograms for the centered/scaled residuals. 
-# This requires converting the provided dataset to a 
-# spatialdataframe using the gstat package. 
-# Note that the center, radius, and center/radius interaction each
-# require their own variograms. 
 utsnow.sp <- utsnow
+
+# Convert to an 'intsp' object that inherits a SpatialPointsDataFrame
 sp::coordinates(utsnow.sp) <- c("LONGITUDE", "LATITUDE")
-sp::proj4string(utsnow.sp) <- "+proj=longlat +ellps=WGS84
-                              +datum=WGS84 +no_defs +towgs84=0,0,0"
-g1 <- gstat::gstat(NULL, "center", rC ~ 1, data = utsnow.sp)
-g1 <- gstat::gstat(g1, "radius", rR ~ 1, data = utsnow.sp)
+sp::proj4string(utsnow.sp) <- sp::proj4string(templocs)
+interval(utsnow.sp) <- c("minDL", "maxDL")
+```
 
-# Automatic variogram fitting uses the gstat package. 
-evgm <- gstat::variogram(g1)
-vsub1 <- evgm[evgm$id == "center", ]
-vsub2 <- evgm[evgm$id == "radius", ]
-vsub3 <- evgm[evgm$id == "center.radius", ]
-check <- gstat::vgm(model = c("Sph", "Sph", "Gau"))
-tvgm1 <- gstat::fit.variogram(vsub1, model = gstat::vgm("Sph"))
-tvgm2 <- gstat::fit.variogram(vsub2, model = gstat::vgm("Sph"))
-tvgm3 <- gstat::fit.variogram(vsub3, model = gstat::vgm("Gau"))
+The objects are defined by the interval slot. Intervals must be defined according to their upper and lower endpoints. The program will not accept values in the interval slot that do not meet this convention. The interval-valued kriging models in the package rely on characterizations of intervals by their center and radius. The center/radius values are calculated automatically as needed by the various functions. This implies that transformations of the interval need to be completed using the upper/lower endpoint specification and can be accomplished by additional calls to the interval slot. 
+```{r varioCheck}
+# analyze interval on log scale
+interval(utsnow.sp) <- log(interval(utsnow.sp))
+```
 
-# Prepare data for function input
-input_locs <- sp::coordinates(utsnow.sp)
-input_int <- as.matrix(utsnow[, c("rC", "rR")])
-pred_locs <-  matrix(c(lons, lats), ncol = 2)
 
-# Run a basic kriging model using argument defaults. 
-preds <- intkrige::intkrige(locations = input_locs, measurements = input_int, 
-                            newdata = pred_locs, modelC = tvgm1, 
-                            modelR = tvgm2, modelCR = tvgm3)
+## Fitting variograms
+Next, we demonstrate how to create and fit empirical variograms. The functions that accomplish this task are fairly shallow wrappers to the sp packages functions for variograms. These functions simplify the workflow by fitting the center, radius, and center/radius variograms using the information contained in the interval slot. The intvariogram defines the empirical variograms, while the fit.intvariogram function automatically fits variograms to the output of intvariogram. Note that intvariogram defines an "intvariogram" class which is the only class that fit.intvariogram will accept. This new class designation is intended to ensure that intvariogram and fit.intvariogram are always used in tandem. These particular variograms first account for the effect of elevation on ground snow loads before calculating the empirical variograms. 
+```{r varioCheck2}
+# Define the formulas we will use to define the intervals. 
+temp_formulas <- list(center ~ ELEVATION, 
+                      radius*(ELEVATION/median(ELEVATION)) ~ 1)
+
+# Define, fit and check the variogram fits. 
+varios <- intvariogram(utsnow.sp,
+                       formulas = temp_formulas)
+varioFit <- fit.intvariogram(varios, models = gstat::vgm(c("Sph", "Sph", "Gau")))
+intvCheck(varios, varioFit)
+```
+
+
+## Interval-valued kriging models
+With variograms defined for each component of the interval, we are now ready to make interval-valued predictions using our interval-valued kriging models. If you explore the function documentaiton, you will notice that many of the function arguments relate to the Newton-Rhapson optimization technique that is used to calculate the kriging model weights. These arguments should not need to be changed from the defaults for most user purposes. The following demonstrates an ordinary kriging model after accounting for elevation. 
+```{r prediction}
+preds <- intkrige::intkrige(locations = utsnow.sp,
+                            newdata = templocs, 
+                            models = varioFit,
+                            formulas = temp_formulas)
 
 # The final results are predicted intervals after removing the effect of elevation.  
 preds
 ```
 
-Note that the prediction for a single location returns four outputs including (in order): 
+The interval prediction that reverses the elevation effect is included in the interval slot. The raw predictions are appended to the data frame under the following variable names:
 
-- center prediction
-- radius prediction
-- kriging prediction variance
-- 0-1 warning for non-convergent optimization (1 if warning, 0 if not). 
+-center: the value of the interval centers returned directly from the kriging model,
+
+-radius: raw radii predictions,
+
+-variance: the kriging variance according the generalized L2 distance,
+
+-warn: a boolean that is 0 for a convergent optimization and 1 for a non-convergent optimization. This quiet approach to warnings ensures a non-disruptive experience for the user when predicting a large number of locations. 
 
 # References
 

@@ -2,7 +2,6 @@
 
 S3method(head,intgrd)
 S3method(head,intsp)
-S3method(plot,intsp)
 S3method(print,intgrd)
 S3method(print,intsp)
 S3method(print,summary.intgrd)
