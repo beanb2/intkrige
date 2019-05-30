@@ -1,6 +1,5 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: R
-sudo: false
+sudo: apt-get install texinfo
 cache: packages
-r_build_args: '--compact-vignettes'

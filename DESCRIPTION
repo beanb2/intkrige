@@ -9,8 +9,8 @@ Description: An interval valued extension of ordinary and simple kriging.
     with a penalty function to impose the constraints.
     Covariances are specified using the \code{\link[gstat]{vgm}}
     object conventions.
-Version: 0.1.0.9000
-Date: 2019-05-22
+Version: 1.0.0
+Date: 2019-05-30
 Authors@R: person("Brennan", "Bean", email = "brennan.bean.20@gmail.com",
     role = c("aut", "cre"))
 License: MIT + file LICENSE

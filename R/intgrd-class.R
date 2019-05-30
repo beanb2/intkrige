@@ -199,7 +199,7 @@ setMethod("interval<-", "SpatialPixelsDataFrame",
           })
 
 # This method redefines how to print the intgrd object to the screen.
-# Adapted from SP
+# Adapted from the sp package
 #' Print the contents of an intgrd object
 #'
 #' This function extends print.sp by including a display and summary of the
@@ -419,7 +419,7 @@ setMethod("as.data.frame", "intgrd", function(x){
 #' Calls the sp::spplot() function to plot the locations, centers, and
 #' radii of an interval-valued spatial data frame in a single figure.
 #'
-#' @param x an object of class intsp or intgrd
+#' @param x an object of class intgrd
 #' @param beside if true, center and radius plotted side by side
 #'  if false, center and radius are plotted in a single figure with the center
 #'  plotted using color and the radius plotted using circles circumsribed
