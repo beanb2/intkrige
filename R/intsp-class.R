@@ -72,7 +72,7 @@ setMethod("interval<-", "intsp",
 
             # A null or na value will cause the intsp object to revert to
             # its parent class.
-            if(is.null(value) || is.na(value)){
+            if(is.null(value) | all(is.na(value))){
               # If the interval slot is not empty, return these values
               # to the data frame.
               if (nrow(x@interval) > 0) {
@@ -99,7 +99,7 @@ setMethod("interval<-", "intsp",
               }
 
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" ||
+              if (class(x@data[, value[1]]) != "numeric" |
                   class(x@data[, value[2]]) != "numeric") {
                 stop("non-numeric input detected")
               }
@@ -120,7 +120,7 @@ setMethod("interval<-", "intsp",
             }else if(class(value) == "matrix"){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
-              if(nrow(value) != nrow(coordinates(x@coords)) ||
+              if(nrow(value) != nrow(coordinates(x@coords)) |
                  ncol(value) != ncol(coordinates(x@coords))){
                 stop("matrix dimensions must match the slot dimensions")
               }
@@ -148,7 +148,7 @@ setMethod("interval<-", "intsp",
 setMethod("interval<-", "SpatialPointsDataFrame",
           function(x, value) {
 
-            if(is.null(value) || is.na(value)){
+            if(is.null(value) | all(is.na(value))){
               warning("No interval provided, interval not specified.")
               return(x)
             }
@@ -157,7 +157,7 @@ setMethod("interval<-", "SpatialPointsDataFrame",
 
             if(class(value) == "character"){
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" ||
+              if (class(x@data[, value[1]]) != "numeric" |
                   class(x@data[, value[1]]) != "numeric") {
                 stop("non-numeric input detected")
               }
@@ -177,7 +177,7 @@ setMethod("interval<-", "SpatialPointsDataFrame",
             }else if(class(value) == "matrix"){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
-              if(nrow(value) != nrow(coordinates(x@coords)) ||
+              if(nrow(value) != nrow(coordinates(x@coords)) |
                  ncol(value) != ncol(coordinates(x@coords))){
                 stop("matrix dimensions must match the slot dimensions")
               }
@@ -309,7 +309,7 @@ summary.intsp = function(object, ...) {
   obj[["vcov"]] <- stats::cov(intkrige::interval(object))
   obj[["itvl"]] <- summary(intkrige::interval(object))
   obj[["npoints"]] = nrow(object@coords)
-  if ("data" %in% slotNames(object) && ncol(object@data) > 0)
+  if ("data" %in% slotNames(object) & ncol(object@data) > 0)
     obj[["data"]] = summary(object@data)
   class(obj) = "summary.intsp"
   obj
@@ -437,13 +437,13 @@ setMethod("plot", signature = c("intsp", "missing"),
               return(test)
             }
 
-            if(length(legend.positions) != 2 || class(legend.positions) != "character"){
+            if(length(legend.positions) != 2 | class(legend.positions) != "character"){
               stop("two character legend positions must be provided")
             }
-            if(length(cuts) != 2 || class(cuts) != "numeric"){
+            if(length(cuts) != 2 | class(cuts) != "numeric"){
               stop("two numeric cut arguments must be provided")
             }
-            if(length(radSize) != 2 || class(radSize) != "numeric"){
+            if(length(radSize) != 2 | class(radSize) != "numeric"){
               stop("two numeric size arguments must be provided")
             }
             if(radSize[2] < radSize[1]){

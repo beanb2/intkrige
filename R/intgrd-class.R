@@ -75,7 +75,7 @@ setMethod("interval<-", "intgrd",
 
             # A null or na value will cause the intgrd object to revert to
             # its parent class.
-            if(is.null(value) || is.na(value)){
+            if(is.null(value) | all(is.na(value))){
               # If the interval slot is not empty, return these values
               # to the data frame.
               if (nrow(x@interval) > 0) {
@@ -100,7 +100,7 @@ setMethod("interval<-", "intgrd",
               }
 
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" ||
+              if (class(x@data[, value[1]]) != "numeric" |
                   class(x@data[, value[1]]) != "numeric") {
                 stop("non-numeric input detected")
               }
@@ -121,7 +121,7 @@ setMethod("interval<-", "intgrd",
             }else if(class(value) == "matrix"){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
-              if(nrow(value) != nrow(coordinates(x@coords)) ||
+              if(nrow(value) != nrow(coordinates(x@coords)) |
                  ncol(value) != ncol(coordinates(x@coords))){
                 stop("matrix dimensions must match the slot dimensions")
               }
@@ -148,7 +148,7 @@ setMethod("interval<-", "intgrd",
 setMethod("interval<-", "SpatialPixelsDataFrame",
           function(x, value) {
 
-            if(is.null(value) || is.na(value)){
+            if(is.null(value) | all(is.na(value))){
               warning("No interval provided, interval not specified.")
               return(x)
             }
@@ -157,7 +157,7 @@ setMethod("interval<-", "SpatialPixelsDataFrame",
 
             if(class(value) == "character"){
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" ||
+              if (class(x@data[, value[1]]) != "numeric" |
                   class(x@data[, value[1]]) != "numeric") {
                 stop("non-numeric input detected")
               }
@@ -177,7 +177,7 @@ setMethod("interval<-", "SpatialPixelsDataFrame",
             }else if(class(value) == "matrix"){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
-              if(nrow(value) != nrow(coordinates(x@coords)) ||
+              if(nrow(value) != nrow(coordinates(x@coords)) |
                  ncol(value) != ncol(coordinates(x@coords))){
                 stop("matrix dimensions must match the slot dimensions")
               }
@@ -308,7 +308,7 @@ summary.intgrd = function(object, ...) {
   obj[["vcov"]] <- stats::cov(interval(object))
   obj[["itvl"]] <- summary(interval(object))
   obj[["grid"]] = gridparameters(object)
-  if ("data" %in% slotNames(object) && ncol(object@data) > 0)
+  if ("data" %in% slotNames(object) & ncol(object@data) > 0)
     obj[["data"]] = summary(object@data)
   class(obj) = "summary.intgrd"
   obj
@@ -451,7 +451,7 @@ setMethod("plot",
 
             }else{
 
-              if(minRad < 0 || minRad > 1){
+              if(minRad < 0 | minRad > 1){
                 stop("minRad must be an argument between 0 and 1")
               }
 

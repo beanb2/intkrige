@@ -40,13 +40,10 @@ Figure \ref{fig:ohMap} shows a map of this region with the 161 stations location
 \end{figure}
 
 ```{r ohioMap, eval = FALSE, echo = FALSE}
-# The following line helps to reduce the image size for use in 
-# a vignette (suggested by R CMD check): 
-tools::compactPDF(gs_quality = "ebook", paths = "vignettes")
 
 library(ggmap)
 # Load the Ohio River Basin Shapefile
-ohMap <- rgdal::readOGR(dsn = "../data-raw/ohMap", layer = "ohMap")
+ohMap <- rgdal::readOGR(dsn = "ohMap", layer = "ohMap")
 
 # key has been removed for security reasons
 register_google(key = "insert key here")
@@ -147,7 +144,7 @@ where $C^{C,C}, C^{R,R}, and C^{C,R}$ are the covariances associated with the ce
 
 The $A_{11}, A_{12}, and A{22}$ parameters are used to weight the importance of different components of the covariance. These three arguments are specified with the \texttt{A} parameter in the \texttt{intkrige} function. The default option assumes no interaction between center and radius, hence the third argument in the vector being equal to 0. This parameter is also effectively set to zero when a third variogram model is not specified. 
 
-The \texttt{eta, thresh, tolq, maxq, tolp, maxp,} and \texttt{r} variables all directly relate to the Penalized Newton-Rhapson technique used minimize $E\left[\rho^2_K\left([\hat{Z}(x^*)], [Z(x^*)]\right)\right]$. The details of this optimization are provided in a companion paper to this package [@Bean2019-int2] and will not be discussed further in this vignette. Note that the user is not given the option to provide an initial guess for kriging weights in the optmization. These functions are designed to predict hundreds, if not thousands, of locations in a single function call. Providing a separate initial guess for each prediction location quickly becomes impractical in such a context. As such, the initital guess for each optimization run are the point-valued simple kriging weights for the centers. It is expected that the final weights will be close to this initital guess and experience has shown that nearly all optimizations converge using this initital guess strategy.These default parameters are intended to work well for most users. The variables are only included in the function package to provide users the flexibility to change them in the event that the optimization fails to converge.
+The \texttt{eta, thresh, tolq, maxq, tolp, maxp,} and \texttt{r} variables all directly relate to the Penalized Newton-Raphson technique used minimize $E\left[\rho^2_K\left([\hat{Z}(x^*)], [Z(x^*)]\right)\right]$. The details of this optimization are provided in a companion paper to this package [@Bean2019-int2] and will not be discussed further in this vignette. Note that the user is not given the option to provide an initial guess for kriging weights in the optmization. These functions are designed to predict hundreds, if not thousands, of locations in a single function call. Providing a separate initial guess for each prediction location quickly becomes impractical in such a context. As such, the initital guess for each optimization run are the point-valued simple kriging weights for the centers. It is expected that the final weights will be close to this initital guess and experience has shown that nearly all optimizations converge using this initital guess strategy.These default parameters are intended to work well for most users. The variables are only included in the function package to provide users the flexibility to change them in the event that the optimization fails to converge.
 
 The \texttt{fast, useR,} and \texttt{cores} variables all relate to potential speedups in the computation time. More about these arguments are found in the function documentation. 
 \end{itemize}
@@ -156,6 +153,9 @@ The \texttt{fast, useR,} and \texttt{cores} variables all relate to potential sp
 As previously mentioned, we can accept the default arguments for the majority of paramters in the \texttt{intkrige} model for our predictions of Ohio temperatures. Because no closed form solution exists for these interval-valued kriging models, the computational time for fine maps can be tremendous. This is one of the reasons for the parrallel processing option when the number of prediction locations is large. We make predictions on a 20 by 20 grid of coordinates defined by the bounding box of the Ohio river valley shapefile. The setup and predictions use the following code. 
 
 ```{r}
+# Include the Ohio river basin shapefile
+data(ohMap)
+
 # New location data preparation
 lon <- seq(-89.26637, -77.83937, length.out = 10)
 lat <- seq(35.31332, 42.44983, length.out = 10)
@@ -180,10 +180,13 @@ plot(preds, beside = FALSE, circleCol = "gray") +
 plot(preds, beside = TRUE)
 ```
 ## Analysis
-Some interesting things of note in these plots in
+These basic plots help us to draw some quick conclusions from the data. First, notice that the highest temperature magnitudes occur in the southern portion of the basin with the largest temperature \textit{ranges} occur in the eastern portion of the basin. The eastern border of the basin runs through the Appalachian mountains. Regions with high elevations such as the Appalachian range are known to experience larger swings in temperature, both on a daily and yearly scale. Similarly, warmer temperatures persist throughout the night in the southern, warmer portion of the basin which would explain why this area has smaller interval radii. It is also noteworthy that the smallest predicted interval radii occur along the northern border of the basin. This is likely explained by the moderating effect that lake Erie has on the daily temperatures in this region.
+
+More important than the temperature inference is the pattern of exploring interval-valued spatial data. This demonstration has illustrated the use of a series of functions designed simplify and enhance interval-valued spatial analysis. We anticipate that future iterations of this package will result in an continual increase of functionality and applications. 
+
 
 ## Troubleshooting Optimization Concerns 
-Each new dataset and variogram models bring with it a new set of considerations for the optimization algorithm. The defaults are intended to work for most purposes but will inevitably fall short in some circumstances. Only the R version of the functions (invoked when \texttt{useR = TRUE}) will print warnings to the screen when the optimization fails. Both the R and c++ verions will flag troublesome predictions by setting warn = 1 in the list of return arguments.  Below is a list of common things to try for various optimization issues. It is recommended that the model first be run on a small set using the R version. Movement to the c++ version should happen after the optimization parameters have been appropriately tuned. 
+Each new dataset and variogram models bring with it a new set of considerations for the optimization algorithm. The defaults are intended to work for most purposes but will inevitably fall short in some circumstances. Only the R version of the functions (invoked when \texttt{useR = TRUE}) will print warnings to the screen when the optimization fails. Both the R and c++ versions will flag troublesome predictions by setting warn = 1 in the list of return arguments.  Below is a list of common things to try for various optimization issues. It is recommended that the model first be run on a small set using the R version. Movement to the c++ version should happen after the optimization parameters have been appropriately tuned. 
 \begin{itemize}
 \item In ordinary kriging (\texttt{trend = NULL}). The warning "left feasible region" is best handled by increasing the value of \texttt{r} and/or increasing the value of \texttt{eta} to be closer to 1. 
 \item In simple kriging (\texttt{trend = !NULL}), the warning "convergent, feasible solution not obtained" is likely best handled by invoking the fast = TRUE option. The fast = FALSE is intended to prevent weights from going to zero and is only relevant when the number of measurement locations is small (around 50 or less). In situations with more stations, the prevention of zero valued weights can cause a failure to converge. If this warning continues to be obtained. Consider increasing the value of \texttt{eta} closer to 1, or increasing the tolerance levels for the convergence criteria. 

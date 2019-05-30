@@ -63,3 +63,9 @@
 #' @references
 #' \insertRef{COOP}{intkrige}
 "ohtemp"
+
+#' Ohio River Basin map
+#'
+#' @format A SpatialPolygons objects with the boundaries of
+#'  the Ohio river basin.
+"ohMap"
