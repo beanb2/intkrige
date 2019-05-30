@@ -222,7 +222,7 @@ print.intgrd = function(x, ..., digits = getOption("digits")) {
   # cannot be converted to a vector.
   df = data.frame("coordinates" = cc, "interval" = int, x@data)
 
-  colnames(df) <- colnames(x@data)
+  colnames(df) <- c("coordinates", "interval", colnames(x@data))
   print(df, ..., digits = digits)
 }
 #' Extension of the show function for intgrd objects
@@ -426,16 +426,14 @@ setMethod("as.data.frame", "intgrd", function(x){
 #'  within each grid cell.
 #' @param circleCol if beside=TRUE, the color of the circles
 #'  that will be circumscribed within each grid cell
-#' @param radPos the position of the reference circle for the radius legend
-#'  represented as an integer from 1 to 4. Each value corresponds to a
-#'  corner of the plot starting in the lower left corner and proceeding
-#'  counter-clockwise.
-#' @param cex.rad controls the size of the text in the Radius legend.
+#' @param minRad the value of the minimum value of the radius in the circles
+#'  drawn to represent the interval radii. Must be a number between 0 and 1.
 #' @param ... additional arguments to sp::spplot()
 #' @method plot intgrd,missing
 setMethod("plot",
           signature = c("intgrd", "missing"),
-          function(x, beside = TRUE, circleCol = "black", radPos = 2, cex.rad = 1, ...){
+          function(x, beside = TRUE, circleCol = "black",
+                   minRad = 0.25, ...){
 
 
             x$center <- (interval(x)[, 1] + interval(x)[, 2]) / 2
@@ -453,13 +451,13 @@ setMethod("plot",
 
             }else{
 
-              # Determine max radius and include in plot title
-              maxrad <- max(x$radius)
+              if(minRad < 0 || minRad > 1){
+                stop("minRad must be an argument between 0 and 1")
+              }
 
-              # Extract the resolution of the grid
-              pc <- sp::spplot(x, zcol = "center",
-                               main = paste("Max radius:", maxrad),
-                               ...)
+              # Determine max radius and include in plot title
+              maxrad <- max(x$radius, na.rm = TRUE)
+              minrad <- min(x$radius, na.rm = TRUE)
 
               # Now extract the coordinates and
               # resolution of the grid.
@@ -467,7 +465,8 @@ setMethod("plot",
               x2 <- as(x, "RasterLayer")
               res <- raster::res(x2)
 
-              radScale <- x$radius/maxrad
+              # Determine the proportion of the distance between max and min
+              radScale <- (x$radius - minrad)/(maxrad - minrad)
 
               # Create circular objects with radii proportional
               # to the value of the radius.
@@ -475,41 +474,64 @@ setMethod("plot",
               ll <- nrow(tempcoords)
               templines <- vector("list", ll)
               for(i in 1:ll){
-                lon <- tempcoords[i, 1] + radScale[i]*(res[1]/2)*cos(rads)
-                lat <- tempcoords[i, 2] + radScale[i]*(res[2]/2)*sin(rads)
+                lon <- tempcoords[i, 1] +
+                  (radScale[i] + (1-radScale[i])*minRad)*(res[1]/2)*cos(rads)
+                lat <- tempcoords[i, 2] +
+                  (radScale[i] + (1-radScale[i])*minRad)*(res[2]/2)*sin(rads)
 
                 templines[[i]] <- Lines(Line(cbind(lon, lat)), ID = as.character(i))
               }
 
-              # Create a legend entry
-              if(radPos == 1){
-                xanchor <- x@bbox[1, 1] + (res[1]/2)
-                yanchor <- x@bbox[2, 1] + (res[2]/2)
-              }else if(radPos == 2){
-                xanchor <- x@bbox[1, 1] + (res[1]/2)
-                yanchor <- x@bbox[2, 2] - (res[2]/2)
-              }else if(radPos == 3){
-                xanchor <- x@bbox[1, 2] - (res[1]/2)
-                yanchor <- x@bbox[2, 2] - (res[2]/2)
-              }else if(radPos == 4){
-                xanchor <- x@bbox[1, 2] - (res[1]/2)
-                yanchor <- x@bbox[2, 1] + (res[2]/2)
-              }else{
-                stop("invalid radius position specified: must be an integer from
-                     1 to 4")
+              # Place radius legend in each corner
+              radLeg <- vector("list", 8)
+              count = 1
+              for(i in 1:4){
+                for(j in 1:2){
+                  if(i == 1){
+                    xanchor <- x@bbox[1, 1] - res[1]/2
+                    yanchor <- x@bbox[2, 1] - res[2]/2
+                  }else if(i == 2){
+                    xanchor <- x@bbox[1, 1] - res[1]/2
+                    yanchor <- x@bbox[2, 2] + res[2]/2
+                  }else if(i == 3){
+                    xanchor <- x@bbox[1, 2] + res[1]/2
+                    yanchor <- x@bbox[2, 2] + res[2]/2
+                  }else{
+                    xanchor <- x@bbox[1, 2] + res[1]/2
+                    yanchor <- x@bbox[2, 1] - res[2]/2
+                  }
+
+                  if(j ==1){
+                    xleg <- (res[1]/2)*cos(rads) + xanchor
+                    yleg <- (res[2]/2)*sin(rads) + yanchor
+                  }else{
+                    xleg <- (res[1]/2)*minRad*cos(rads) + xanchor
+                    yleg <- (res[2]/2)*minRad*sin(rads) + yanchor
+                  }
+
+                  radLeg[[count]] <- Lines(Line(cbind(xleg, yleg)),
+                                           ID = count)
+                  count <- count + 1
+                }
               }
 
-              xleg <- xanchor + (res[1]/2)*cos(rads)
-              yleg <- yanchor + (res[2]/2)*sin(rads)
 
-              radLeg <- SpatialLines(list(Lines(Line(cbind(xleg, yleg)), ID="legend")))
-
+              radLeg <- SpatialLines(radLeg)
               tester <- SpatialLines(templines)
 
+              # Extract the resolution of the grid
+              pc <- sp::spplot(x, zcol = "center",
+                               main = paste("Min radius: ", round(minrad, 3), "; ",
+                                            "Max radius: ", round(maxrad, 3), sep = ""),
+                               xlim = c(x@bbox[1, 1] - res[1],
+                                        x@bbox[1, 2] + res[1]),
+                               ylim = c(x@bbox[2, 1] - res[2],
+                                        x@bbox[2, 2] + res[2]),
+                               ...)
               p2 <- pc +
                 latticeExtra::layer(sp.lines(tester, col = circleCol),
                                     data = list(tester = tester,
-                                                circleCol = circleCol)) +
+                                                circleCol = circleCol))+
                 latticeExtra::layer(sp.lines(radLeg, col = circleCol),
                                     data = list(radLeg = radLeg,
                                                 circleCol = circleCol))

@@ -2,6 +2,7 @@
 # - https://github.com/variani/pckdev/wiki/Documenting-with-roxygen2#s4-methods
 #' @import utils
 #' @import methods
+#' @importFrom  raster raster
 NULL
 
 #' An interval extension of a SpatialPixelsDataFrame

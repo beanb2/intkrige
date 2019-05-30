@@ -123,10 +123,10 @@ intkrige <- function(locations, newdata, models,
   if(class(locations) != "intsp"){
     stop("locations must be of class intsp")
   }
-  if(class(newdata) != "SpatialPointsDataFrame" &&
-     class(newdata) != "SpatialPixelsDataFrame"){
-    stop("newdata must be of class SpatialPointsDataFrame or
-         SpatialPixelsDataFrame")
+  if(inherits(newdata, "SpatialPointsDataFrame") &&
+     inherits(newdata, "SpatialPixelsDataFrame")){
+    stop("newdata must inherit class SpatialPoints or
+         SpatialPixels")
   }
   if(class(models) != "list" || length(models) < 2 || length(models) > 3){
     stop("models must be a list of 2-3 variograms")
@@ -328,11 +328,30 @@ intkrige <- function(locations, newdata, models,
     temp_predicts <- predicts
   }
 
-  # add raw prediction information to the measurement data frame
-  newdata$center <- temp_predicts[, 1]
-  newdata$radius <- temp_predicts[, 2]
-  newdata$kriging_variance <- temp_predicts[, 3]
-  newdata$warn <- temp_predicts[, 4]
+  # Determine if we need to create a data slot for the upper and lower enpoints.
+  if(class(newdata) == "SpatialPixels"){
+    newdata <-
+      sp::SpatialPixelsDataFrame(newdata,
+                                 data = data.frame(center = temp_predicts[, 1],
+                                                   radius = temp_predicts[, 2],
+                                                   kriging_variance = temp_predicts[, 3],
+                                                   warn = temp_predicts[, 4]))
+  }else if(class(newdata) == "SpatialPoints"){
+    newdata <-
+      sp::SpatialPointsDataFrame(newdata,
+                                 data = data.frame(center = temp_predicts[, 1],
+                                                   radius = temp_predicts[, 2],
+                                                   kriging_variance = temp_predicts[, 3],
+                                                   warn = temp_predicts[, 4]))
+  }else{
+    # add raw prediction information to the existing data frame.
+    # this will inadvertently overwrite data with the same names
+    # already existing in the frame.
+    newdata$center <- temp_predicts[, 1]
+    newdata$radius <- temp_predicts[, 2]
+    newdata$kriging_variance <- temp_predicts[, 3]
+    newdata$warn <- temp_predicts[, 4]
+  }
 
   # Transform back to original units and fill the interval slot.
   if(as.character(formulas[[1]][[3]]) != "1"){
@@ -359,9 +378,15 @@ intkrige <- function(locations, newdata, models,
     radius_final <- newdata$radius
   }
 
+
   # Create interval-valued spatial object
-  newdata$lower <- center_final - radius_final
-  newdata$upper <- center_final + radius_final
+  lower <- center_final - radius_final
+  upper <- center_final + radius_final
+
+  newdata$lower = lower
+  newdata$upper = upper
+
+
   interval(newdata) <- c("lower", "upper")
 
   # Return the appended newdata spatial object

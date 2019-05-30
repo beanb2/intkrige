@@ -130,9 +130,7 @@ intvCheck(varios, varioFit)
 
 Note that for the observed data, the theoretical variogram models provide a decent fit to the data.
 
-## Interval-valued kriging
-
-### Arguments
+## Interval-valued kriging arguments
 
 With our fitted variograms, we are now ready to make temperature predictions on the grid using interval valued kriging. There are 17 different arguments for the intkrige function. This may seem like a tremendous amount but all but 3 of these arguments have default options that allow for a fast implementation. All of these arguments can be separated into three general categories: data, models and optimization. A brief description of each group and the included variables is provided below:
 \begin{itemize}
@@ -154,18 +152,41 @@ The \texttt{eta, thresh, tolq, maxq, tolp, maxp,} and \texttt{r} variables all d
 The \texttt{fast, useR,} and \texttt{cores} variables all relate to potential speedups in the computation time. More about these arguments are found in the function documentation. 
 \end{itemize}
 
-### Application
-As previously mentioned, we can accept the default arguments for the majority of paramters in the \texttt{intkrige} model for our predictions of Ohio temperatures. Because no closed form solution exists for these interval-valued kriging models, the computational time for fine maps can be tremendous. We therefore make predictions on a very coarse 30km by 30km grid using coordinates digital elevatoin models (DEMs) obtained from the National Map (CITE) and aggregated using the raster package (CITE). 
+## Application
+As previously mentioned, we can accept the default arguments for the majority of paramters in the \texttt{intkrige} model for our predictions of Ohio temperatures. Because no closed form solution exists for these interval-valued kriging models, the computational time for fine maps can be tremendous. This is one of the reasons for the parrallel processing option when the number of prediction locations is large. We make predictions on a 20 by 20 grid of coordinates defined by the bounding box of the Ohio river valley shapefile. The setup and predictions use the following code. 
+
+```{r}
+# New location data preparation
+lon <- seq(-89.26637, -77.83937, length.out = 10)
+lat <- seq(35.31332, 42.44983, length.out = 10)
+newlocations <- expand.grid(lon, lat)
+colnames(newlocations) <- c("lon", "lat")
+sp::coordinates(newlocations) <- c("lon", "lat")
+sp::proj4string(newlocations) <- sp::proj4string(ohtemp)
+sp::gridded(newlocations) <- TRUE
+
+# Replace non-convergent variogram fit with a surrogate that 
+# contains a reasonable range and sill. 
+varioFit[[1]] <- gstat::vgm(psill = 370, nugget = 4.608542, 
+                            range = 500, model = "Sph")
 
 
+# Adjust r and theta to ensure answers remain in feasible region.
+preds <- intkrige(ohtemp, newlocations, varioFit, 
+                  A = c(1, 1, 0.5), r = 200, eta = 0.8)
 
+plot(preds, beside = FALSE, circleCol = "gray") + 
+  latticeExtra::layer(sp.lines(ohMap, col = "white"))
+plot(preds, beside = TRUE)
+```
+## Analysis
+Some interesting things of note in these plots in
 
+## Troubleshooting Optimization Concerns 
+Each new dataset and variogram models bring with it a new set of considerations for the optimization algorithm. The defaults are intended to work for most purposes but will inevitably fall short in some circumstances. Only the R version of the functions (invoked when \texttt{useR = TRUE}) will print warnings to the screen when the optimization fails. Both the R and c++ verions will flag troublesome predictions by setting warn = 1 in the list of return arguments.  Below is a list of common things to try for various optimization issues. It is recommended that the model first be run on a small set using the R version. Movement to the c++ version should happen after the optimization parameters have been appropriately tuned. 
+\begin{itemize}
+\item In ordinary kriging (\texttt{trend = NULL}). The warning "left feasible region" is best handled by increasing the value of \texttt{r} and/or increasing the value of \texttt{eta} to be closer to 1. 
+\item In simple kriging (\texttt{trend = !NULL}), the warning "convergent, feasible solution not obtained" is likely best handled by invoking the fast = TRUE option. The fast = FALSE is intended to prevent weights from going to zero and is only relevant when the number of measurement locations is small (around 50 or less). In situations with more stations, the prevention of zero valued weights can cause a failure to converge. If this warning continues to be obtained. Consider increasing the value of \texttt{eta} closer to 1, or increasing the tolerance levels for the convergence criteria. 
+\item The warning "feasible solution obtained from a non-convergent optimization step" is likely best handled by lowering the value of eta, which controls the rate of imposition of the penalty parameter. 
+\end{itemize}
 
-
-
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-
-[via] \url{https://twitter.com/hadleywickham/status/504368538874703872}

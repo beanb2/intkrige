@@ -19,11 +19,10 @@ LazyData: true
 Imports: 
     Rcpp (>= 1.0.0), 
     RcppArmadillo, 
-    gstat, 
     Rdpack, 
     methods,
     stats, 
-    utils
+    utils,
 Suggests: 
     doParallel,
     foreach,
@@ -36,7 +35,9 @@ Suggests:
     rmarkdown
 Depends: 
     R (>= 3.5.0),
-    sp (>= 1.3-1)
+    sp (>= 1.3-1),
+    gstat,
+    raster
 RdMacros: Rdpack
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.1.1

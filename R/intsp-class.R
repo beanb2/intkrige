@@ -222,7 +222,7 @@ print.intsp = function(x, digits = getOption("digits"), ...) {
   # cannot be converted to a vector.
   df = data.frame("coordinates" = cc, "interval" = int, x@data)
 
-  colnames(df) <- colnames(x@data)
+  colnames(df) <- c("coordinates", "interval", colnames(x@data))
   print(df, ..., digits = digits)
 }
 #' Extension of the show function for intgrd objects

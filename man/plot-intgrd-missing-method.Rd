@@ -6,7 +6,7 @@
 \title{Create an interval plot for spatial grid.}
 \usage{
 \S4method{plot}{intgrd,missing}(x, beside = TRUE, circleCol = "black",
-  radPos = 2, cex.rad = 1, ...)
+  minRad = 0.25, ...)
 }
 \arguments{
 \item{x}{an object of class intsp or intgrd}
@@ -19,12 +19,8 @@ within each grid cell.}
 \item{circleCol}{if beside=TRUE, the color of the circles
 that will be circumscribed within each grid cell}
 
-\item{radPos}{the position of the reference circle for the radius legend
-represented as an integer from 1 to 4. Each value corresponds to a
-corner of the plot starting in the lower left corner and proceeding
-counter-clockwise.}
-
-\item{cex.rad}{controls the size of the text in the Radius legend.}
+\item{minRad}{the value of the minimum value of the radius in the circles
+drawn to represent the interval radii. Must be a number between 0 and 1.}
 
 \item{...}{additional arguments to sp::spplot()}
 }

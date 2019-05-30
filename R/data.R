@@ -50,7 +50,7 @@
 #'  \item{LATITUDE}{Latitude coordinate position}
 #'  \item{LONGITUDE}{Longitude coordinate position}
 #'  \item{ELEVATION}{Elevation of the measurement location (meters)}
-#'  \item{minm}{The 30 year mean daily minimum temperature}
+#'  \item{minm}{The 30 year mean daily minimum temperature (measured in )}
 #'  \item{maxm}{The 30 year mean daily maximum temperature }
 #'
 #'  }
