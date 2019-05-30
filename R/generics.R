@@ -1,17 +1,18 @@
 # The following link saved my bacon when trying to document s4 methods:
 # - https://github.com/variani/pckdev/wiki/Documenting-with-roxygen2#s4-methods
 #' @import utils
-#' @importFrom methods new
+#' @import methods
 NULL
+
 #' An interval extension of a SpatialPixelsDataFrame
 #'
 #' @slot interval a matrix of two columns representing the lower and upper
 #'  endpoints of an interval.
 #'
 #' @export
-intgrd <- methods::setClass("intgrd",
-                            contains = "SpatialPixelsDataFrame",
-                            slots = c(interval = "matrix"))
+intgrd <- setClass("intgrd",
+                   contains = c("SpatialPixelsDataFrame"),
+                   slots = c(interval = "matrix"))
 
 #' An interval extension of a SpatialPointsDataFrame
 #'
@@ -19,9 +20,11 @@ intgrd <- methods::setClass("intgrd",
 #'  endpoints of an interval.
 #'
 #' @export
-intsp <- methods::setClass("intsp",
-                  contains = "SpatialPointsDataFrame",
+intsp <- setClass("intsp",
+                  contains = c("SpatialPointsDataFrame"),
                   slots = c(interval = "matrix"))
+
+
 
 #=============================================================================
 #' Function to extract the interval of an intsp or intgrd object
@@ -30,21 +33,21 @@ intsp <- methods::setClass("intsp",
 #' @name interval
 #' @rdname interval-methods
 #' @exportMethod interval
-methods::setGeneric("interval",
-                    function(x)
-                      standardGeneric("interval"))
+setGeneric("interval",
+           function(x)
+             standardGeneric("interval"))
 
 #' Function to reassign the contents of the interval slot
 #' @param x an object of class intsp or intgrd
-#' @return either a character vector of length two specifying the column names
+#' @param value either a character vector of length two specifying the column names
 #'  which will occupy the interval slot. Or a matrix of two columns to fill
 #'  the slot.
 #' @name interval<-
 #' @rdname interval-methods-assign
 #' @exportMethod interval<-
-methods::setGeneric("interval<-",
-                    function(x, value)
-                      standardGeneric("interval<-"))
+setGeneric("interval<-",
+           function(x, value)
+             standardGeneric("interval<-"))
 
 # Generic to inititate the contents of the "intsp" interval slot.
 
@@ -60,9 +63,9 @@ methods::setGeneric("interval<-",
 #' @name intvariogram
 #' @rdname intvariogram-methods
 #' @exportMethod intvariogram
-methods::setGeneric("intvariogram",
-                    function(x, formulas = list(center ~ 1, radius ~ 1), ...)
-                      standardGeneric("intvariogram"))
+setGeneric("intvariogram",
+           function(x, formulas = list(center ~ 1, radius ~ 1), ...)
+             standardGeneric("intvariogram"))
 #=============================================================================
 
 #=============================================================================
@@ -82,6 +85,7 @@ NULL
 #' @param x an object of class \'intsp\' or class \'intgrd\'
 #' @param name the variable name on which to subset. This variable name can be
 #' located in the data, coordinates, or interval slot.
+#' @param value the new data used to replace the existing data in the desired slot.
 #' @name $<-
 #' @rdname assign-methods
 NULL
@@ -94,30 +98,5 @@ NULL
 #' @rdname interval.as.data.frame-methods
 NULL
 
-#' Create an interval plot for spatial points.
-#'
-#' Calls the sp::spplot() function to plot the locations, centers, and
-#' radii of an interval-valued spatial data frame in a single figure.
-#'
-#' @param x an object of class intsp or intgrd
-#' @param beside (intgrd only) if true, center and radius plotted side by side
-#'  if false, center and radius are plotted in a single figure with the center
-#'  plotted using color and the radius plotted using circles circumsribed
-#'  within each grid cell.
-#' @param circleCol (intgrdonly) if beside=TRUE, the color of the circles
-#'  that will be circumscribed within each grid cell
-#' @param locationsOnly a boolean: TRUE calls plot.sp(x)
-#' @param legend.positions the positions of the center and radius legend
-#' relative to the plotting window
-#' @param cuts the number of ranges of values to print in the center and radius
-#' legend respectively
-#' @param radSize a vector of length 2 indicating the range of point sizes to
-#' plot to visualize radii magnitudes
-#' @param pch the shape of the points (see plot())
-#' @param alpha the transparency of the points
-#' @param ... additional arguments to sp::spplot()
-#'
-#' @name plot
-#' @rdname plot.interval-methods
-NULL
+
 

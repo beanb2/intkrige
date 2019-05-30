@@ -21,11 +21,15 @@ fit.intvariogram <-
     if(class(x)[1] != "intvariogram"){
       stop("Function only defined for objects of class intvariogram")
     }
-    if(class(models)[1] != "variogramModelList"){
+    if(class(models)[1] != "variogramModelList" && class(models)[1] != "list"){
       stop("models must be specified as a list object")
     }
     if(length(models) < 2 || length(models) > 3){
       stop("between 2 and three variogram models must be specified")
+    }
+    if(class(models[[1]])[1] != "variogramModel" ||
+       class(models[[2]])[1] != "variogramModel"){
+      stop("each component of the model argument must be a variogram model")
     }
 
     # Fit the variogram models in the following order:

@@ -1,0 +1,171 @@
+---
+title: "Introduction to Interval-Valued Kriging Analysis"
+author: "Brennan Bean"
+date: "`r Sys.Date()`"
+output: rmarkdown::pdf_document
+bibliography: ../inst/REFERENCES.bib
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The README associated with the intkrige package provides a brief example of this workflow using the design ground snow load dataset for Utah that is included with this package. Further details regarding this interval-valued analysis are provided in [@Bean2019-int] and [@Bean2019-int2]. This vignette extends the demonstrations provided in the README by conducting an interval-valued analysis for temperatures in the Ohio River basin. 
+
+## Data
+The Ohio river basin includes most of the states of Ohio, West Virginia, Kentucky, and Indiana, as well as parts of Pennsylvania, Illinois, and Tennessee. The region is approximately 204,000 square miles and home to nearly 25 million people [@Ohio2019]. We wish to map the magnitude \textit{and} range of temperatures across this region. This is done by creating intervals of the 30 year mean maximum and minimum temperature for available measurement locations. 
+
+Measurement locations were downloaded from National Oceanic and Atmospheric Administration's (NOAA) Global Historical Climatological Network (GHCN) [@COOP]. The 161 remaining observations in the dataset all contained 30 years of records with at least 300 daily observation for calendar years 1988 to 2018. Intervals were created using a 5% trimmed 30 year mean for maximum and minimum temperatures respectively. These data are included in the package and can be accessed with the commands
+
+```{r}
+library(intkrige)
+data(ohtemp)
+head(ohtemp)
+```
+
+Figure \ref{fig:ohMap} shows a map of this region with the 161 stations locations overlaid. The code for this map makes use of the ggmap package [@ggmap]. The code to generate the map is not provided as successful compilation requires a registered Google API account. 
+
+\begin{figure}
+\centering
+\includegraphics[width = 0.5\textwidth]{ohmap.pdf}
+\caption{Map of the 161 temperature stations in the Ohio River Basin.}
+\label{fig:ohMap}
+\end{figure}
+
+```{r ohioMap, eval = FALSE, echo = FALSE}
+# The following line helps to reduce the image size for use in 
+# a vignette (suggested by R CMD check): 
+tools::compactPDF(gs_quality = "ebook", paths = "vignettes")
+
+library(ggmap)
+# Load the Ohio River Basin Shapefile
+ohMap <- rgdal::readOGR(dsn = "../data-raw/ohMap", layer = "ohMap")
+
+# key has been removed for security reasons
+register_google(key = "insert key here")
+center = apply(ohMap@bbox, 1, mean)
+
+oh.google <- ggmap::get_googlemap(center = center, zoom = 6, 
+                                    maptype = "terrain",
+                                    color = "bw",
+                                  style = "feature:all|element:labels|visibility:off|
+                           &style=feature:road|element:all|visibility:off|
+                           &style=feature:landscape.man_made|element:all|visibility:off|",
+                                    key = "insert key here")
+
+map <- ggmap(oh.google) +
+  xlim(ohMap@bbox[1, 1], ohMap@bbox[1, 2]) + 
+  xlab("Longitude (easting)") +
+  ylim(ohMap@bbox[2, 1], ohMap@bbox[2, 2]) + 
+  ylab("Latitude (northing)") + 
+  geom_polygon(data = ohMap, aes(x = long, y = lat), 
+               colour = "gray50", fill = NA, lwd = 1.1, lty = 1) +
+  geom_point(data = as.data.frame(ohtemp), aes(x = LONGITUDE, y = LATITUDE), 
+             pch = 16, alpha = 0.9) + 
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        axis.title = element_text(size = 16))
+
+pdf("../vignettes/ohmap.pdf", width = 8, height = 8)
+map
+dev.off()
+```
+
+
+
+## Interval exploration
+Our goal is to create an interval-valued map of the mean maximum and minimum temperatures across the region. The intkrige package provides a formal workflow for analyzing interval valued data. It does so by extending SpatialPointsDataFrame and SpatialPixelsDataFrame objects from the sp package [@Bivand2008]. This is accomplished through the interval function. 
+
+```{r}
+# First, create a SpatialPointsDataFrame in the usual way
+sp::coordinates(ohtemp) <- c("LONGITUDE", "LATITUDE")
+sp::proj4string(ohtemp) <- CRS("+proj=longlat +ellps=WGS84")
+interval(ohtemp) <- c("minm", "maxm")
+
+head(ohtemp)
+```
+
+This function creates an instance of an "intsp" objects. Use of the interval function on SpatialPixelsDataFrame objects creates instances of "intgrd" objects. Both of these objects contain an interval slot that extend their respective classes. This interval slot can be observed in the printed output above. The interval slot is filled by specifying column names within the data frame, or specifying a two-column matrix with the same number of rows as the object data. These two forms of specification allow for convenient transformations of the interval with the appropriate calls. 
+
+```{r}
+interval(ohtemp) <- log(interval(ohtemp))
+head(ohtemp)
+```
+
+The interval-valued kriging models defined in this package rely on characterizations of the spatial relationships for the interval centers, the interval radii, and the spatial interaction between centers and radii. The center and radius relationships require definitions, while the center/radius interaction is optional. The most common way of exploring these spatial relationships is through the use of an empirical variogram, which measures pairwise differences in measurements $z$ with locations $\mathbf{u}_\alpha$ as a function of the difference in location $\mathbf{h}$. This is defined symbolically as 
+
+\begin{equation}
+\gamma(\mathbf{h}) = \frac{1}{2N(\mathbf{h})}\sum_{\alpha=1}^{N(\mathbf{h})}\left[z(\mathbf{u}_\alpha) - z(\mathbf{u}_\alpha+h)\right]^2
+\label{eqn:vario}
+\end{equation}
+where $N(\mathbf{h})$ represents the number of station pairs with location difference $\mathbf{h}$ [@Goovaerts1997]. 
+
+We define empirical variograms for the center and radii using equation \ref{eqn:vario}. We define an empirical variogram for the center/radius interaction using the cross covariance analog to equation \ref{eqn:vario}. This can be accomplished using wrappers to existing functionality in the gstat package. These wrapper functions exploit the predictable structure of the interval slot in the intsp and intgrd objects to calculate the three empirical variograms simultaneously. 
+
+```{r}
+# Revert back to the standard interval
+interval(ohtemp) <- exp(interval(ohtemp))
+varios <- intvariogram(ohtemp, cutoff = 500)
+
+plot(varios)
+```
+
+The results of this plot help us to define variogram models for each component. Note that the primarily class of the function output is "intvariogram". This new S3 class distinguishes this output from other lists of empirical variograms.  
+
+It looks as though the radius and center radius interactions could be modeled with Spherical variograms while the centers could be modeled with a linear variogram. The fit.intvariogram function provides a wrapper to the fit.variogram function in the gstat package to fit theoretical variograms to each of the empirical variograms. This function only accepts objects of class intvariogram and is designed to be used in tandem with the intvariogram function. The intvcheck function allows for a quick evaluation of the model output from fit.intvariogram. We will use the default which is to fit spherical variograms to each component. This will likely yield an error due to the linear structure of the first model. However, the result will be the selection of an arbitrary sill and range which is fine for our purposes. 
+
+```{r}
+varioFit <- fit.intvariogram(varios)
+varioFit
+intvCheck(varios, varioFit)
+```
+
+Note that for the observed data, the theoretical variogram models provide a decent fit to the data.
+
+## Interval-valued kriging
+
+### Arguments
+
+With our fitted variograms, we are now ready to make temperature predictions on the grid using interval valued kriging. There are 17 different arguments for the intkrige function. This may seem like a tremendous amount but all but 3 of these arguments have default options that allow for a fast implementation. All of these arguments can be separated into three general categories: data, models and optimization. A brief description of each group and the included variables is provided below:
+\begin{itemize}
+\item \textbf{Data:} the \texttt{locations} and \texttt{newdata} arguments define all of the locations used for inference and prediction.
+\item \textbf{Models:} The \texttt{models} and \texttt{trend} arguments control the type and behavior of the interval valued kriging model. The \texttt{trend} argument corresponds to the known mean of the interval-valued centers. When specified, this argument leads the function to use simple instead of ordinary kriging. The \texttt{models} argument includes the list of variogram models used to calculate the kriging weights.   
+\item \textbf{Optimization:} Interval-valued kriging amounts the minimizing the function
+\begin{eqnarray}
+&&E\left[\rho^2_K\left([\hat{Z}(x^*)], [Z(x^*)]\right)\right]\nonumber\\
+&=&A_{11}\left[\sum_i\sum_j\lambda_i\lambda_jC^{C,C}(x_i-x_j)-2\sum_i\lambda_iC^{C,C}(x_i-x^*)\right]\nonumber\\
+&+&A_{22}\left[\sum_i\sum_j\left|\lambda_i\lambda_j\right|C^{R,R}(x_i-x_j)-2\sum_i\left|\lambda_i\right|C^{R,R}(x_i-x^*)\right]\nonumber\\
+&+&2A_{12}\left[\sum_i\sum_j\lambda_i|\lambda_i|C^{C,R}(x_i-x_j)-\sum_i|\lambda_i|C^{C,R}(x^*-x_i)-\sum_i\lambda_iC^{C,R}(x_i-x^*)\right]\label{eqn:pred-var-cov}
+\end{eqnarray}
+where $C^{C,C}, C^{R,R}, and C^{C,R}$ are the covariances associated with the center, radius, and center/radius interaction. This is can be equivalently defined using the corresponding variograms. However, the current optimization relies on the use of the covariance definitions. Since variograms are specified in the function argument, the function assumes that the variograms exist and calculates them using \texttt{gstat::variogramLine(x, cov)}.
+
+The $A_{11}, A_{12}, and A{22}$ parameters are used to weight the importance of different components of the covariance. These three arguments are specified with the \texttt{A} parameter in the \texttt{intkrige} function. The default option assumes no interaction between center and radius, hence the third argument in the vector being equal to 0. This parameter is also effectively set to zero when a third variogram model is not specified. 
+
+The \texttt{eta, thresh, tolq, maxq, tolp, maxp,} and \texttt{r} variables all directly relate to the Penalized Newton-Rhapson technique used minimize $E\left[\rho^2_K\left([\hat{Z}(x^*)], [Z(x^*)]\right)\right]$. The details of this optimization are provided in a companion paper to this package [@Bean2019-int2] and will not be discussed further in this vignette. Note that the user is not given the option to provide an initial guess for kriging weights in the optmization. These functions are designed to predict hundreds, if not thousands, of locations in a single function call. Providing a separate initial guess for each prediction location quickly becomes impractical in such a context. As such, the initital guess for each optimization run are the point-valued simple kriging weights for the centers. It is expected that the final weights will be close to this initital guess and experience has shown that nearly all optimizations converge using this initital guess strategy.These default parameters are intended to work well for most users. The variables are only included in the function package to provide users the flexibility to change them in the event that the optimization fails to converge.
+
+The \texttt{fast, useR,} and \texttt{cores} variables all relate to potential speedups in the computation time. More about these arguments are found in the function documentation. 
+\end{itemize}
+
+### Application
+As previously mentioned, we can accept the default arguments for the majority of paramters in the \texttt{intkrige} model for our predictions of Ohio temperatures. Because no closed form solution exists for these interval-valued kriging models, the computational time for fine maps can be tremendous. We therefore make predictions on a very coarse 30km by 30km grid using coordinates digital elevatoin models (DEMs) obtained from the National Map (CITE) and aggregated using the raster package (CITE). 
+
+
+
+
+
+
+
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+
+[via] \url{https://twitter.com/hadleywickham/status/504368538874703872}

@@ -1,3 +1,4 @@
+inst/doc
 # Ignore raw data files (too big to push)
 data-raw/
 
@@ -6,4 +7,3 @@ data-raw/
 .Rproj.user/
 .Rproj
 .Rproj.user
-

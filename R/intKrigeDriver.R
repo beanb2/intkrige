@@ -81,8 +81,36 @@
 #' @useDynLib intkrige, .registration = TRUE
 #' @importFrom Rcpp evalCpp
 #'
+#' @examples
+#' # First, define the location and elevation of interest.
+#' # (In this case we pick coordinates of Utah State University)
+#' templocs <- data.frame(lat = 41.745, long = -111.810, ELEVATION = 1456)
+#' sp::coordinates(templocs) <- c("long", "lat")
+#' sp::proj4string(templocs) <- "+proj=longlat +ellps=WGS84
+#' +datum=WGS84 +no_defs +towgs84=0,0,0"
+#'
+#' # Load the Utah Snow Load Data
+#' data(utsnow)
+#' utsnow.sp <- utsnow
+#'
+#' # Convert to an 'intsp' object that inherits a SpatialPointsDataFrame
+#' sp::coordinates(utsnow.sp) <- c("LONGITUDE", "LATITUDE")
+#' sp::proj4string(utsnow.sp) <- sp::proj4string(templocs)
+#' interval(utsnow.sp) <- c("minDL", "maxDL")
+#' # Define the formulas we will use to define the intervals.
+#' temp_formulas <- list(center ~ ELEVATION,
+#'                      radius*(ELEVATION/median(ELEVATION)) ~ 1)
+#'
+#' # Define, fit and check the variogram fits.
+#' varios <- intvariogram(utsnow.sp,
+#'                        formulas = temp_formulas)
+#' varioFit <- fit.intvariogram(varios, models = gstat::vgm(c("Sph", "Sph", "Gau")))
+#' preds <- intkrige::intkrige(locations = utsnow.sp,
+#' newdata = templocs,
+#' models = varioFit,
+#' formulas = temp_formulas)
+#'
 #' @export
-# TODO: Examples.
 intkrige <- function(locations, newdata, models,
                      formulas = list(center ~ 1, radius ~ 1),
                      eta = 0.75, A = c(1, 1, 0), trend = NULL,
@@ -90,7 +118,6 @@ intkrige <- function(locations, newdata, models,
                      tolp = .001, maxp = 100, r = 1, useR = TRUE,
                      fast = FALSE, weights = FALSE,
                      cores = 1){
-
   ### Error checks for for spatial objects
   #===========================================================================
   if(class(locations) != "intsp"){

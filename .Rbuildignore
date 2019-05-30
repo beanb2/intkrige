@@ -1,3 +1,5 @@
+^\.travis\.yml$
+^cran-comments\.md$
 ^betatesting\.R$
 ^data-raw$
 ^README\.Rmd$

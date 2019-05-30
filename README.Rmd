@@ -5,6 +5,8 @@ bibliography: inst/REFERENCES.bib
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+[![Travis build status](https://travis-ci.org/beanb2/intkrige.svg?branch=master)](https://travis-ci.org/beanb2/intkrige)
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,

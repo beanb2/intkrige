@@ -4,14 +4,14 @@
 \alias{print.intsp}
 \title{Print the contents of an intsp object}
 \usage{
-\method{print}{intsp}(x, ..., digits = getOption("digits"))
+\method{print}{intsp}(x, digits = getOption("digits"), ...)
 }
 \arguments{
 \item{x}{an object of class intsp}
 
-\item{...}{additional arguments to base::print}
-
 \item{digits}{default option from sp package}
+
+\item{...}{additional arguments to base::print}
 }
 \value{
 nothing
