@@ -61,7 +61,7 @@ vignette("intkriging-workflow")
 Defining Classes and Variograms
 -------------------------------
 
-The intkrige package relies on interval-valued spatial objects. These objects are named "intsp" and "intgrd" respectively. "intsp" inherits directly from "SpatialPointsDataFrame" objects in the sp class, while "intgrd" inherits from "SpatialPixelsDataFrame". These class extensions are created using the function as demonstrated below.
+The intkrige package relies on interval-valued spatial objects. These objects are named *intsp* and *intgrd* respectively. *intsp* inherits directly from *SpatialPointsDataFrame* objects in the sp class, while *intgrd* inherits from *SpatialPixelsDataFrame*. These class extensions are created using the *interval()* function as demonstrated below.
 
 ``` r
 library(intkrige)
