@@ -20,7 +20,7 @@
  }
 
  @details
- The interval valued kriging analysis described in Bean et. al. 2019 analyzes this dataset on a
+ The interval valued kriging analysis described in Bean et. al. (2019) analyzes this dataset on a
  log scale after removing the effect of elevation. An example of predictions using this workflow are
  found in the README.md file associated with this package.}
 \usage{

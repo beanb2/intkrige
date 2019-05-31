@@ -15,15 +15,10 @@ Ohio river basin.}
  \item{LATITUDE}{Latitude coordinate position}
  \item{LONGITUDE}{Longitude coordinate position}
  \item{ELEVATION}{Elevation of the measurement location (meters)}
- \item{minm}{The 30 year mean daily minimum temperature (measured in )}
- \item{maxm}{The 30 year mean daily maximum temperature }
+ \item{minm}{The 30 year mean daily minimum temperature (tenths of degrees Celsius)}
+ \item{maxm}{The 30 year mean daily maximum temperature (tenths of degrees Celsius)}
 
- }
-
- @details
- The interval valued kriging analysis described in Bean et. al. 2019 analyzes this dataset on a
- log scale after removing the effect of elevation. An example of predictions using this workflow are
- found in the README.md file associated with this package.}
+ }}
 \usage{
 ohtemp
 }
@@ -34,8 +29,5 @@ observations in this dataset all had at least 300 daily observations of
 temperature in at least 30 of the 31 considered years. The mean was
 calculated after trimming 10% of the data in the tails to remove the
 influence of potential outliers.
-}
-\references{
-\insertRef{COOP}{intkrige}
 }
 \keyword{datasets}

@@ -18,7 +18,7 @@
 located in the data, coordinates, or interval slot.}
 }
 \value{
-the value contained in the requested subset
+the requested subset
 }
 \description{
 Atomic subsetting of interval spatial objects.

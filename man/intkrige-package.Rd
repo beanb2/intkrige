@@ -19,7 +19,7 @@ An interval valued extension of ordinary and simple kriging.
 
 \itemize{
 \item \code{\link{intkrige}} Predict using an interval-valued kriging model.
-\item \code{\link{dist_cpp}} Function to compute geographic or euclidean
+\item \code{\link{dist_cpp}} Function to compute geographic or Euclidean
 distances.
 }
 }

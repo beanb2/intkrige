@@ -24,9 +24,8 @@ centers and radii respectively.}
 \item{...}{additional arguments for sp::variogram()}
 }
 \value{
-an object of class \'intvariogram\' containing empi
-rcal variograms
-for the center, radius, and center/radius interaction.
+an object of class \'intvariogram\' containing empirical variograms
+ for the center, radius, and center/radius interaction.
 }
 \description{
 Function to fit empirical variograms for an interval-valued spatial object

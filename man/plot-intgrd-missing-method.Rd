@@ -9,7 +9,7 @@
   minRad = 0.25, ...)
 }
 \arguments{
-\item{x}{an object of class intsp or intgrd}
+\item{x}{an object of class intgrd}
 
 \item{beside}{if true, center and radius plotted side by side
 if false, center and radius are plotted in a single figure with the center

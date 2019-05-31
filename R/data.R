@@ -1,4 +1,4 @@
-#'An interval-valued design ground snow load dataset for Utah.
+#' An interval-valued design ground snow load dataset for Utah.
 #'
 #' A dataset containing the interval-valued data used in the analysis
 #' of Bean et. at (2019). The 415 measurement locations
@@ -20,7 +20,7 @@
 #'  }
 #'
 #'  @details
-#'  The interval valued kriging analysis described in Bean et. al. 2019 analyzes this dataset on a
+#'  The interval valued kriging analysis described in Bean et. al. (2019) analyzes this dataset on a
 #'  log scale after removing the effect of elevation. An example of predictions using this workflow are
 #'  found in the README.md file associated with this package.
 #'
@@ -50,22 +50,15 @@
 #'  \item{LATITUDE}{Latitude coordinate position}
 #'  \item{LONGITUDE}{Longitude coordinate position}
 #'  \item{ELEVATION}{Elevation of the measurement location (meters)}
-#'  \item{minm}{The 30 year mean daily minimum temperature (measured in )}
-#'  \item{maxm}{The 30 year mean daily maximum temperature }
+#'  \item{minm}{The 30 year mean daily minimum temperature (tenths of degrees Celsius)}
+#'  \item{maxm}{The 30 year mean daily maximum temperature (tenths of degrees Celsius)}
 #'
 #'  }
-#'
-#'  @details
-#'  The interval valued kriging analysis described in Bean et. al. 2019 analyzes this dataset on a
-#'  log scale after removing the effect of elevation. An example of predictions using this workflow are
-#'  found in the README.md file associated with this package.
-#'
-#' @references
-#' \insertRef{COOP}{intkrige}
 "ohtemp"
 
 #' Ohio River Basin map
 #'
 #' @format A SpatialPolygons objects with the boundaries of
-#'  the Ohio river basin.
+#'  the Ohio river basin. Shapefile obtained from the U.S. Geological Survey
+#'  National WaterShed Boundary Dataset.
 "ohMap"

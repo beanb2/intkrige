@@ -58,9 +58,8 @@ setGeneric("interval<-",
 #' @param formulas a list of length two specifying the formulas related to the
 #' centers and radii respectively.
 #' @param ... additional arguments for sp::variogram()
-#' @return an object of class \'intvariogram\' containing empi
-#' rcal variograms
-#' for the center, radius, and center/radius interaction.
+#' @return an object of class \'intvariogram\' containing empirical variograms
+#'  for the center, radius, and center/radius interaction.
 #' @name intvariogram
 #' @rdname intvariogram-methods
 #' @exportMethod intvariogram
@@ -76,7 +75,7 @@ setGeneric("intvariogram",
 #' @param x an object of class \'intsp\' or class \'intgrd\'
 #' @param name the variable name on which to subset. This variable name can be
 #' located in the data, coordinates, or interval slot.
-#' @return the value contained in the requested subset
+#' @return the requested subset
 #' @name $
 #' @rdname extract-methods
 NULL

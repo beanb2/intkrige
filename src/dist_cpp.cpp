@@ -14,10 +14,10 @@
 
 //' Distance matrix calculation.
 //'
-//' Calculation of euclidean or geograhic distance. Based on an adaptation of
+//' Calculation of Euclidean or geographic distance. Based on an adaptation of
 //' rdist.earth in the fields package. Uses earth radius = 6378.388 for
 //' great circle distance calculations.
-//' @param loc1 a two column matrix represeting the longitude/latitude
+//' @param loc1 a two column matrix representing  the longitude/latitude
 //' (i.e. x/y) coordinates of the first set of distances.
 //' @param loc2 a two column matrix representing the longitude/latitude
 //' (i.e. x/y) coordinates of the second set of distances
@@ -32,8 +32,8 @@
 //' distMat <- dist_cpp(locs1, locs1, geographic = TRUE)
 //' @details
 //' Note that while this function is still available to users. It is not actively used
-//'  in the intkrige function. Instead, for user convienence, distances are calculated
-//'  usingdistance functions in the sp package.
+//'  in the intkrige function. Instead, for user convenience, distances are calculated
+//'  using distance functions in the sp package.
 //' @export
 // [[Rcpp::export]]
 arma::mat dist_cpp(const arma::mat & loc1, const arma::mat & loc2,
