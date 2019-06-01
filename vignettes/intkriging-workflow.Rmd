@@ -47,8 +47,12 @@ library(ggmap)
 # Load the Ohio River Basin Shapefile
 ohMap <- rgdal::readOGR(dsn = "ohMap", layer = "ohMap")
 
+# Simplify the shapefile 
+ohMap <- rgeos::gSimplify(ohMap, tol = .05, topologyPreserve = TRUE)
+
 # key has been removed for security reasons
-register_google(key = "insert key here")
+# register_google(key = "insert key here")
+register_google(key = "AIzaSyC4YkrhEYxf-cMheqv0Se8xzedyNhYOm0Y")
 center = apply(ohMap@bbox, 1, mean)
 
 oh.google <- ggmap::get_googlemap(center = center, zoom = 6, 
@@ -56,8 +60,7 @@ oh.google <- ggmap::get_googlemap(center = center, zoom = 6,
                                     color = "bw",
                                   style = "feature:all|element:labels|visibility:off|
                            &style=feature:road|element:all|visibility:off|
-                           &style=feature:landscape.man_made|element:all|visibility:off|",
-                                    key = "insert key here")
+                           &style=feature:landscape.man_made|element:all|visibility:off|")
 
 map <- ggmap(oh.google) +
   xlim(ohMap@bbox[1, 1], ohMap@bbox[1, 2]) + 
@@ -73,7 +76,7 @@ map <- ggmap(oh.google) +
         axis.text = element_text(size = 16),
         axis.title = element_text(size = 16))
 
-pdf("../vignettes/ohmap.pdf", width = 8, height = 8)
+pdf("vignettes/ohmap.pdf", width = 8, height = 8)
 map
 dev.off()
 ```
