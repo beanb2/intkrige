@@ -4,7 +4,7 @@
 \name{intkrige-package}
 \alias{intkrige-package}
 \alias{_PACKAGE}
-\title{intkrige package: Interval-valued kriging models in R.}
+\title{INTERVAL-VALUED KRIGING MODELS IN R}
 \description{
 An interval valued extension of ordinary and simple kriging.
     Optimization of the function is based on a generalized interval distance.

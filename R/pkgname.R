@@ -1,6 +1,6 @@
 # See the DESCRIPTION FILE for the text that populates the description section
 # in the RD file.
-#' intkrige package: Interval-valued kriging models in R.
+#' INTERVAL-VALUED KRIGING MODELS IN R
 #' @aliases intkrige-package
 #'
 #' @section Functions:

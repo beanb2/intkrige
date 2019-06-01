@@ -3,4 +3,3 @@
 language: R
 sudo: apt-get install texinfo
 cache: packages
-r_build_args: '--compact-vignettes=qpdf'
