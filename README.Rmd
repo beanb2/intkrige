@@ -123,7 +123,7 @@ preds <- intkrige::intkrige(locations = utsnow.sp,
 preds
 ```
 
-The interval prediction that reverses the elevation effect is included in the interval slot. The raw predictions are appended to the data frame under the following variable names:
+The interval prediction (including the elevation effect) is included in the interval slot. The raw predictions are appended to the data frame under the following variable names:
 
 -center: the value of the interval centers returned directly from the kriging model,
 
