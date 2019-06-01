@@ -18,7 +18,6 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     Rcpp (>= 1.0.0), 
-    RcppArmadillo, 
     Rdpack, 
     methods,
     stats, 

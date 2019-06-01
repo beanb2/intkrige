@@ -67,7 +67,9 @@ The intkrige package relies on interval-valued spatial objects. These objects ar
 library(intkrige)
 #> Loading required package: sp
 #> Loading required package: gstat
+#> Warning: package 'gstat' was built under R version 3.5.3
 #> Loading required package: raster
+#> Warning: package 'raster' was built under R version 3.5.3
 
 # First, define the location and elevation of interest. 
 # (In this case we pick coordinates of Utah State University)
@@ -131,7 +133,7 @@ preds
 #> 1        0.1517327    0
 ```
 
-The interval prediction that reverses the elevation effect is included in the interval slot. The raw predictions are appended to the data frame under the following variable names:
+The interval prediction (including the elevation effect) is included in the interval slot. The raw predictions are appended to the data frame under the following variable names:
 
 -center: the value of the interval centers returned directly from the kriging model,
 
