@@ -5,7 +5,10 @@
 ## R CMD check results
 
 windows: 0 errors | 0 warnings | 0 notes
-ubu
+ubuntu:  0 errors | 0 warnings | 1 note
+
+The note indicated the installed package size was greater than 5mb. 
+However, this seems to be an error as the 
 
 * This is a new release.
 
