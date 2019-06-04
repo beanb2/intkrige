@@ -1,3 +1,10 @@
+# These classes are extensions of classes in the sp package
+# Source code for the sp package can be obtained from
+#
+# https://github.com/edzer/sp
+#
+NULL
+
 # The following link saved my bacon when trying to document s4 methods:
 # - https://github.com/variani/pckdev/wiki/Documenting-with-roxygen2#s4-methods
 #' @import utils

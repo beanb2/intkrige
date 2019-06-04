@@ -1,8 +1,13 @@
 ### CREATE CLASSES ###
 #=============================================================================
 # This is the "intsp" class, which extends the "SpatialPointsDataFrame"
-# class in the sp package.
-# All we do is add a slot for intervals that can be called by plot,
+# class in the sp package. Many of the generic methods defined here were
+# adapted from code in the sp package.
+# Source code for the sp package can be obtained from
+#
+# https://github.com/edzer/sp
+#
+# We add a slot for intervals that can be called by plot,
 # print, and summary functions.
 NULL
 #=============================================================================

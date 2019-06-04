@@ -1,8 +1,17 @@
 ### CREATE CLASSES ###
 #=============================================================================
 # This is the "intgrd" class, which extends the "SpatialPixelsDataFrame"
-# class. All we do is add a slot for intervals that can be called by plot,
+# class. Many of the generic methods defined here were
+# adapted from code in the sp package.
+# Source code for the sp package can be obtained from
+#
+# https://github.com/edzer/sp
+#
+# We add a slot for intervals that can be called by plot,
 # print, and summary functions.
+NULL
+
+# Necessary package imports and inclusions
 #' @import sp
 #' @import gstat
 #' @include generics.R

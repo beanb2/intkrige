@@ -1,5 +1,5 @@
 ---
-title: "Intoducing the Interval-Valued Kriging Workflow"
+title: "Introducing the Interval-Valued Kriging Workflow"
 author: "Brennan Bean"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
