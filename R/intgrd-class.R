@@ -266,6 +266,7 @@ head.intgrd = function(x, n = 6, ..., digits = getOption("digits")){
   colnames(df) <- c("coordinates", "interval", colnames(x@data))
   print(df[1:n, ], ..., digits = digits)
 }
+setMethod("head", "intgrd", function(x, ...) head.intgrd(x, ...))
 
 # This method redefines how to print the tail of the intgrd object to the screen.
 # Adapted from SP
@@ -294,6 +295,7 @@ tail.intgrd = function(x, n = 6, ..., digits = getOption("digits")){
   colnames(df) <- c("coordinates", "interval", colnames(x@data))
   print(df[(nrow(df)-(n-1)):nrow(df), ], ..., digits = digits)
 }
+setMethod("tail", "intgrd", function(x, ...) tail.intgrd(x, ...))
 
 
 # This method adapts the summary.spatial to include a covariance matrix

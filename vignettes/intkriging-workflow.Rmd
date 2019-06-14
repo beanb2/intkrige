@@ -41,15 +41,16 @@ The following figure shows a map of this region with the 161 stations locations 
 ```{r ohioMap, eval = FALSE, echo = FALSE}
 
 library(ggmap)
-# Load the Ohio River Basin Shapefile
-ohMap <- rgdal::readOGR(dsn = "ohMap", layer = "ohMap")
-
-# Simplify the shapefile 
-ohMap <- rgeos::gSimplify(ohMap, tol = .05, topologyPreserve = TRUE)
+# # Load the Ohio River Basin Shapefile
+# ohMap <- rgdal::readOGR(dsn = "ohMap", layer = "ohMap")
+# 
+# # Simplify the shapefile 
+# ohMap <- rgeos::gSimplify(ohMap, tol = .05, topologyPreserve = TRUE)
+data(ohMap)
 
 # key has been removed for security reasons
 # register_google(key = "insert key here")
-register_google(key = "my_key")
+register_google(key = "AIzaSyCUKc6tYQyo7yzSCoZ7KSzyuvBE3KMv7Dc")
 center = apply(ohMap@bbox, 1, mean)
 
 oh.google <- ggmap::get_googlemap(center = center, zoom = 6, 
@@ -73,7 +74,7 @@ map <- ggmap(oh.google) +
         axis.text = element_text(size = 16),
         axis.title = element_text(size = 16))
 
-png("vignettes/ohmap.png")
+pdf("vignettes/ohmap.png", width = 4, height = 4)
 map
 dev.off()
 ```

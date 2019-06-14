@@ -264,6 +264,7 @@ head.intsp <- function(x, n = 6, ..., digits = getOption("digits")) {
   colnames(df) <- c("coordinates", "interval", colnames(x@data))
   print(df[1:n, ], digits = digits, ...)
 }
+setMethod("head", "intsp", function(x, ...) head.intsp(x, ...))
 
 # This method redefines how to print the tail of the intsp object to the screen.
 # Adapted from sp package source code
@@ -292,6 +293,7 @@ tail.intsp = function(x, n = 6, ..., digits = getOption("digits")) {
   colnames(df) <- c("coordinates", "interval", colnames(x@data))
   print(df[(nrow(df)-(n-1)):nrow(df), ], ..., digits = digits)
 }
+setMethod("tail", "intsp", function(x, ...) tail.intsp(x, ...))
 
 
 # This method adapts the summary.spatial to include a covariance matrix
