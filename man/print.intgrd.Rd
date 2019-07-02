@@ -7,14 +7,17 @@
 \method{print}{intgrd}(x, ..., digits = getOption("digits"))
 }
 \arguments{
-\item{x}{an object of class intgrd}
+\item{x}{An object of class \code{intgrd}.}
 
-\item{...}{additional arguments to base::print}
+\item{...}{Additional arguments to \code{\link{print}}.}
 
-\item{digits}{default option from sp package}
+\item{digits}{Determines how numeric values are printed to the screen
+(default from \code{sp} package).}
 }
 \value{
-nothing
+Prints object to the screen, identical to
+  \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+  interval slot.
 }
 \description{
 This function extends print.sp by including a display and summary of the

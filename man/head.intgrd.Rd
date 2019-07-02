@@ -7,17 +7,19 @@
 \method{head}{intgrd}(x, n = 6, ..., digits = getOption("digits"))
 }
 \arguments{
-\item{x}{an object of class intgrd}
+\item{x}{An object of class \code{intgrd}.}
 
-\item{n}{number of rows to print to the screen}
+\item{n}{Number of rows to print to the screen.}
 
-\item{...}{additional arguments to print}
+\item{...}{Additional arguments to \code{print}.}
 
-\item{digits}{determines how values are printed to the screen
-(default from sp package)}
+\item{digits}{Determines how numeric values are printed to the screen
+(default from \code{sp} package).}
 }
 \value{
-nothing
+Prints a subset of the object observations to the screen,
+  identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+  summary statistics for the interval slot.
 }
 \description{
 This function extends print.sp by including a display and summary of the

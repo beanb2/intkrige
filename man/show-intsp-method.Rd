@@ -8,7 +8,7 @@
 \S4method{show}{intsp}(object)
 }
 \arguments{
-\item{object}{and object of class intgrd}
+\item{object}{An object of class \code{intsp}.}
 }
 \description{
 Extension of the show function for intgrd objects

@@ -2,24 +2,27 @@
 % Please edit documentation in R/intsp-class.R
 \name{head.intsp}
 \alias{head.intsp}
-\title{Print the head of an intsp object.}
+\title{Print the head of an \code{intsp} object.}
 \usage{
 \method{head}{intsp}(x, n = 6, ..., digits = getOption("digits"))
 }
 \arguments{
-\item{x}{an object of class intsp}
+\item{x}{An object of class \code{intsp}.}
 
-\item{n}{number of rows to print to the screen}
+\item{n}{The number of rows to print to the screen.}
 
-\item{...}{additional arguments to print}
+\item{...}{Additional arguments to \code{\link{print}}.}
 
-\item{digits}{determines how values are printed to the screen
-(default from sp package)}
+\item{digits}{Determines how values are printed to the screen (default
+taken from sp package).}
 }
 \value{
-nothing
+Prints a subset of the object to the screen, identical to
+  \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+  interval slot.
 }
 \description{
-This function extends print.sp by including a display and summary of the
-interval slot for the object.
+This function extends printing methods in the \code{sp} package
+  by including a display and summary of the head of the
+  interval slot for the object.
 }

@@ -7,17 +7,19 @@
 \method{tail}{intgrd}(x, n = 6, ..., digits = getOption("digits"))
 }
 \arguments{
-\item{x}{an object of class intgrd}
+\item{x}{An object of class \code{intgrd}.}
 
-\item{n}{number of rows to print to the screen}
+\item{n}{The number of rows to print to the screen.}
 
-\item{...}{additional arguments to utils::tail()}
+\item{...}{Additional arguments to \code{tail}.}
 
-\item{digits}{determines how numbers are displayed (default taken from
-package sp)}
+\item{digits}{Determines how numbers are displayed to the screen
+(default taken from package \code{sp}).}
 }
 \value{
-nothing
+Prints a subset of the object observations to the screen,
+  identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+  summary statistics for the interval slot.
 }
 \description{
 This function extends print.sp by including a display and summary of the

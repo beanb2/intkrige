@@ -16,16 +16,16 @@ intvariogram(x, formulas = list(center ~ 1, radius ~ 1), ...)
   1), ...)
 }
 \arguments{
-\item{x}{an object of class intsp or intgrd}
+\item{x}{An object of class intsp or intgrd.}
 
-\item{formulas}{a list of length two specifying the formulas related to the
+\item{formulas}{A list of length two specifying the formulas related to the
 centers and radii respectively.}
 
-\item{...}{additional arguments for sp::variogram()}
+\item{...}{Additional arguments for sp::variogram().}
 }
 \value{
-an object of class \'intvariogram\' containing empirical variograms
- for the center, radius, and center/radius interaction.
+An object of class 'intvariogram' containing empirical variograms
+  for the center, radius, and center/radius interaction.
 }
 \description{
 Function to fit empirical variograms for an interval-valued spatial object

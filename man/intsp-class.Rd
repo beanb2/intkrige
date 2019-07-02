@@ -11,7 +11,7 @@ An interval extension of a SpatialPointsDataFrame
 \section{Slots}{
 
 \describe{
-\item{\code{interval}}{a matrix of two columns representing the lower and upper
+\item{\code{interval}}{A matrix of two columns representing the lower and upper
 endpoints of an interval.}
 }}
 

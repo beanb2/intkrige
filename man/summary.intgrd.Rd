@@ -2,20 +2,22 @@
 % Please edit documentation in R/intgrd-class.R
 \name{summary.intgrd}
 \alias{summary.intgrd}
-\title{Summarize the contents of an intgrd object, including special summaries for
-the interval slot.}
+\title{Summarize the contents of an \code{intgrd} object,
+including special summaries for the interval slot.}
 \usage{
 \method{summary}{intgrd}(object, ...)
 }
 \arguments{
-\item{object}{an object of class intgrd}
+\item{object}{An object of class \code{intgrd}.}
 
-\item{...}{additional arguments to base::summary().}
+\item{...}{Additional arguments to \code{\link{summary}}.}
 }
 \value{
-nothing
+Prints a summary of the object observations to the screen,
+  identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+  summary statistics for the interval slot.
 }
 \description{
-Summarize the contents of an intgrd object, including special summaries for
-the interval slot.
+Summarize the contents of an \code{intgrd} object,
+including special summaries for the interval slot.
 }

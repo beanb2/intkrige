@@ -11,9 +11,14 @@ An interval valued extension of ordinary and simple kriging.
     This creates a non-differentiable cost function that requires a
     differentiable approximation to the absolute value function. This
     differentiable approximation is optimized using a Newton-Raphson algorithm
-    with a penalty function to impose the constraints.
-    Covariances are specified using the \code{\link[gstat]{vgm}}
-    object conventions.
+    with a penalty function to impose the constraints. Analyses in the package
+    are driven by the \code{\linkS4class{intsp}} and \code{\linkS4class{intgrd}} 
+    classes, 
+    which are interval-valued extensions of
+    \code{\linkS4class{SpatialPointsDataFrame}} and 
+    \code{\linkS4class{SpatialPixelsDataFrame}} respectively. 
+    The package includes
+    many wrapper functions to functions in the gstat and sp packages.
 }
 \section{Functions}{
 
@@ -21,19 +26,21 @@ The package contains several generic functions such as
  \code{\link[=plot,intsp,missing-method]{plot}},
  \code{\link[=print.intsp]{print}},
  and \code{\link[=summary.intsp]{summary}} to facilitate
- interval-valued analysis. In addition to these functions, the package
- also contains the following functions:
+ interval-valued analysis. In addition to these functions,
+ the package also contains the following functions:
 
 \itemize{
-\item \code{\link{intkrige}} Make predictions on interval-valued spatial data
- using interval-valued kriging.
+\item \code{\link{intkrige}} Make predictions on
+ interval-valued spatial data using interval-valued kriging.
 \item \code{\link{interval<-}} Create an interval-valued spatial object.
-\item \code{\link{intvariogram}} Simultaneously calculate the empirical variograms for an
- interval-valued spatial object.
+\item \code{\link{intvariogram}} Simultaneously calculate the empirical variograms
+ for an interval-valued spatial object.
 \item \code{\link{fit.intvariogram}} Automatically fit theoretical variograms to
  empirical variograms obtained from interval-valued spatial objects.
-\item \code{\link{intvCheck}} Visualize the variogram fits for interval-valued spatial objects.
-\item \code{\link{dist_cpp}} A c++ function to calculate great circle or Euclidean distances.
+\item \code{\link{intvCheck}} Visualize the variogram fits for interval-valued
+ spatial objects.
+\item \code{\link{dist_cpp}} A c++ function to calculate great circle
+ or Euclidean distances.
 }
 }
 
@@ -43,7 +50,8 @@ The package contains several generic functions such as
 \item \link{utsnow} An interval-valued design ground snow load dataset for Utah.
 \item \link{ohtemp} An interval-valued 30 year mean temperature dataset for the
  Ohio River Basin.
-\item \link{ohMap} A SpatialPolygons Shapefile for the Ohio River Basin.
+\item \link{ohMap} A \code{\link[sp:SpatialPolygons]{SpatialPolygons}}
+  shapefile for the Ohio River Basin.
 }
 }
 

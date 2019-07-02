@@ -6,7 +6,7 @@
 \title{Ohio River Basin map}
 \format{A SpatialPolygons objects with the boundaries of
  the Ohio river basin. Shapefile obtained from the U.S. Geological Survey
- National WaterShed Boundary Dataset.}
+ National Watershed Boundary Dataset.}
 \usage{
 ohMap
 }

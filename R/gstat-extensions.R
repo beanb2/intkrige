@@ -5,15 +5,14 @@
 #=============================================================================
 #' Function to create a variogram object for interval-valued data.
 #'
-#' @param x an object of class intvariogram
-#' @param models an object of class variogramModelList. Must specify at least
-#' two variogram models to fit (for center and radius) if less than three
-#' models are specified then the method fails to fit a variogram for the
-#' center radius interaction.
-#' @param ... additional arguments to gstat::fit.variogram()
+#' @param x An object of class \code{intvariogram}.
+#' @param models an object of class \code{variogramModelList}. The user must
+#'   specify at least two variogram models to fit (for center and radius).
+#'   If less than three models are specified then the method does not fit a
+#'   variogram for the center/radius interaction.
+#' @param ... Additional arguments for \code{\link[gstat]{fit.variogram}}.
 #'
-#' @return a list containing the parameters for each of the three (or two)
-#' fitted variograms.
+#' @return A list of variograms objects from the gstat package.
 #'
 #' @export
 fit.intvariogram <-
@@ -49,11 +48,11 @@ fit.intvariogram <-
 #' Function to visualize the three variograms from an interval valued
 #' spatial data frame.
 #'
-#' @param x an object of class intvariogram
-#' @param models a list of fitted variogram models, typically an output of
-#' fit.intvariogram
-#' @param ... additional arguments to gstat::plot.variogram()
-#' @return nothing (but do plot to the screen)
+#' @param x An object of class \code{intvariogram}.
+#' @param models A list of fitted variogram models, typically an output of
+#' \code{\link{fit.intvariogram}}.
+#' @param ... Additional arguments to
+#'   \code{\link[gstat]{plot.gstatVariogram}}.
 #' @export
 intvCheck <- function(x, models, ...){
   p1 <- plot(x[x$id == "center", ], model = models[[1]],

@@ -7,29 +7,30 @@
 dist_cpp(loc1, loc2, geographic)
 }
 \arguments{
-\item{loc1}{a two column matrix representing  the longitude/latitude
+\item{loc1}{A two column matrix representing  the longitude/latitude
 (i.e. x/y) coordinates of the first set of distances.}
 
-\item{loc2}{a two column matrix representing the longitude/latitude
+\item{loc2}{A two column matrix representing the longitude/latitude
 (i.e. x/y) coordinates of the second set of distances
 (for pairwise distance matrix set loc1 = loc2).}
 
-\item{geographic}{If TRUE, calculate great circle distance. If FALSE, calculate
-Euclidean distance.}
+\item{geographic}{If TRUE, calculate great circle distance.
+If FALSE, calculate Euclidean distance.}
 }
 \value{
-Matrix of pairwise distances between each combination of rows from loc1
-and loc2 respectively.
+A matrix of pairwise distances between each combination
+  of rows from loc1 and loc2 respectively.
 }
 \description{
 Calculation of Euclidean or geographic distance. Based on an adaptation of
-rdist.earth in the fields package. Uses earth radius = 6378.388 for
-great circle distance calculations.
+  \code{\link[fields]{rdist.earth}} in the fields package.
+  Uses earth radius = 6378.388 for great circle distance calculations.
 }
 \details{
-Note that while this function is still available to users. It is not actively used
- in the intkrige function. Instead, for user convenience, distances are calculated
- using distance functions in the sp package.
+Note that while this function is still available to users. It is not
+  actively used in the \code{intkrige} function. Instead,
+  for user convenience, distances are calculated using distance
+  functions in the \code{sp} package.
 }
 \examples{
 data(utsnow)

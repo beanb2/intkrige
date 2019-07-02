@@ -7,12 +7,14 @@
 \method{print}{summary.intgrd}(x, ...)
 }
 \arguments{
-\item{x}{an object an object of class intgrd}
+\item{x}{An object of class \code{intgrd}.}
 
-\item{...}{additional arguments to print()}
+\item{...}{Additional arguments to \code{\link{print}}.}
 }
 \value{
-nothing
+Prints a subset of the object observations to the screen,
+  identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+  summary statistics for the interval slot.
 }
 \description{
 Print the object summary to the screen.

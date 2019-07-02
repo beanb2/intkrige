@@ -19,10 +19,9 @@
 #'
 #'  }
 #'
-#'  @details
-#'  The interval valued kriging analysis described in Bean et. al. (2019) analyzes this dataset on a
+#' @details The interval valued kriging analysis described in Bean et. al. (2019) analyzes this dataset on a
 #'  log scale after removing the effect of elevation. An example of predictions using this workflow are
-#'  found in the README.md file associated with this package.
+#'  found in the README associated with this package.
 #'
 #' @references
 #' \insertRef{Bean2019-int}{intkrige}
@@ -60,5 +59,5 @@
 #'
 #' @format A SpatialPolygons objects with the boundaries of
 #'  the Ohio river basin. Shapefile obtained from the U.S. Geological Survey
-#'  National WaterShed Boundary Dataset.
+#'  National Watershed Boundary Dataset.
 "ohMap"

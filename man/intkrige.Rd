@@ -17,16 +17,15 @@ locations with an interval-valued response.}
 SpatialPixelsDataFrame specifying the locations at which to predict
 intervals.}
 
-\item{models}{a list of variogram models of class vgm (see \link[gstat]{vgm})
-When specified, the third model represents vgm model
-for the center/radius interaction.}
+\item{models}{A list of variogram models of class vgm (see \link[gstat]{vgm})
+When specified, the third model represents the center/radius interaction.}
 
-\item{formulas}{a list of two formulas specifying the centering and scaling
-of the center and radius respectively. Note the limitations to these
-forumlas as specified in the details.}
+\item{formulas}{A list of two formulas specifying the centering and scaling
+of the center and radius respectively. Limitations to these
+formulas are specified in the details.}
 
-\item{eta}{growth/shrink parameter for penalty term.
-For simple kriging: eta > 1. For ordinary kriging eta < 1.}
+\item{eta}{A growth/shrink parameter for penalty term.
+For simple kriging: eta > 1. For ordinary kriging: eta < 1.}
 
 \item{A}{vector of length three representing the weights
 of the generalized L2 distance: the vector of three contains the weights for
@@ -34,7 +33,8 @@ the center, radius, and center/radius respectively.
 A = c(1, 1, 0) assumes the regular L2 distance calculation for intervals.}
 
 \item{trend}{If null, use ordinary kriging. When specified, represents the
-known mean of the stationary process, an indication to use simple kriging.}
+known mean of the stationary process and is an indication to use
+simple kriging.}
 
 \item{thresh}{Let n = length(locations). When abs(lam_i) < 1/(n*thresh),
 this lambda value is set to 0.}
@@ -42,7 +42,7 @@ this lambda value is set to 0.}
 \item{tolq}{For a set penalty term, convergence is satisfied if
 max(abs(lamUp-lam)) < tolq.}
 
-\item{maxq}{For a set penalty term, max number of iterations
+\item{maxq}{For a set penalty term, the max number of iterations
 allowed for convergence.}
 
 \item{tolp}{When abs(sum(abs(lam)) - 1) < tolp, consider the
@@ -59,9 +59,10 @@ If FALSE, use the rcppArmadillo version.}
 
 \item{fast}{(Simple kriging only). If TRUE, allows lambdas to converge to 0
 and subsets matrices accordingly. When FALSE, runs simple kriging using a
-barrier penalty at 0. Fast = TRUE is orders of maginitude faster than the
-full implementation. However, it is not recommended when input measurements
-are sparse as it is known to have convergence issues in these cases.}
+barrier penalty at 0. Fast = TRUE is orders of magnitude faster than the
+full implementation. However, it is not recommended when input
+measurements are sparse as it is known to have convergence issues
+in these cases.}
 
 \item{weights}{If TRUE, return the vector kriging weights for each prediction.
 If false, simply return the predicted output.}
@@ -95,18 +96,18 @@ of the algorithm.
 }
 \details{
 The formulas argument is current fairly limited in its use. For example
- the center argument can accept no transformations of the dependent
- variable. Similarly, the radius argument can accept no variable arguments
- as independent variables. The idea behind this limited use of formulas is
- that any transformations should be applied to the entire interval prior
- to input into interval-valued kriging. This ensures that input into the
- interval-valued kriging algorithm are well-defined intervals with
- properly ordered upper and lower endpoints. The transformation that
- are allowed within this function are linear shifts of the center, and
- linear scalings of the radius.
- Note that the scaling term for the radius can contain a division parameter
- but it must be encapsulated in parenthesis and included on the right hand
- side of the multiplication parameter.
+  the center argument can accept no transformations of the dependent
+  variable. Similarly, the radius argument can accept no variable arguments
+  as independent variables. The idea behind this limited use of formulas is
+  that any transformations should be applied to the entire interval prior
+  to input into interval-valued kriging. This ensures that input into the
+  interval-valued kriging algorithm are well-defined intervals with
+  properly ordered upper and lower endpoints. The transformation that
+  are allowed within this function are linear shifts of the center, and
+  linear scaling of the radius.
+  Note that the scaling term for the radius can contain a division parameter
+  but it must be encapsulated in parenthesis and included on the right hand
+  side of the multiplication parameter.
 }
 \examples{
 # First, define the location and elevation of interest.

@@ -12,12 +12,12 @@
 \S4method{$}{intsp}(x, name) <- value
 }
 \arguments{
-\item{x}{an object of class \'intsp\' or class \'intgrd\'}
+\item{x}{An object of class \code{intsp} or class \code{intgrd}.}
 
-\item{name}{the variable name on which to subset. This variable name can be
+\item{name}{The variable name on which to subset. This variable name can be
 located in the data, coordinates, or interval slot.}
 
-\item{value}{the new data used to replace the existing data in the desired slot.}
+\item{value}{The new data used to replace the existing data in the desired slot.}
 }
 \description{
 Atomic assignment of interval spatial objects.

@@ -8,15 +8,13 @@ spatial data frame.}
 intvCheck(x, models, ...)
 }
 \arguments{
-\item{x}{an object of class intvariogram}
+\item{x}{An object of class \code{intvariogram}.}
 
-\item{models}{a list of fitted variogram models, typically an output of
-fit.intvariogram}
+\item{models}{A list of fitted variogram models, typically an output of
+\code{\link{fit.intvariogram}}.}
 
-\item{...}{additional arguments to gstat::plot.variogram()}
-}
-\value{
-nothing (but do plot to the screen)
+\item{...}{Additional arguments to
+\code{\link[gstat]{plot.gstatVariogram}}.}
 }
 \description{
 Function to visualize the three variograms from an interval valued

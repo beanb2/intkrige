@@ -5,21 +5,22 @@
 \alias{$}
 \alias{$,intgrd-method}
 \alias{$,intsp-method}
-\title{Atomic subsetting of interval spatial objects.}
+\title{Atomic sub-setting of interval spatial objects.}
 \usage{
 \S4method{$}{intgrd}(x, name)
 
 \S4method{$}{intsp}(x, name)
 }
 \arguments{
-\item{x}{an object of class \'intsp\' or class \'intgrd\'}
+\item{x}{An object of class \code{intsp} or class \code{intgrd}.}
 
-\item{name}{the variable name on which to subset. This variable name can be
+\item{name}{The variable name on which to subset. This variable name can be
 located in the data, coordinates, or interval slot.}
 }
 \value{
-the requested subset
+The requested information from the data, coordinate,
+  or interval slot.
 }
 \description{
-Atomic subsetting of interval spatial objects.
+Atomic sub-setting of interval spatial objects.
 }

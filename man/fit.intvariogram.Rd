@@ -7,18 +7,17 @@
 fit.intvariogram(x, models = gstat::vgm(rep("Sph", 3)), ...)
 }
 \arguments{
-\item{x}{an object of class intvariogram}
+\item{x}{An object of class \code{intvariogram}.}
 
-\item{models}{an object of class variogramModelList. Must specify at least
-two variogram models to fit (for center and radius) if less than three
-models are specified then the method fails to fit a variogram for the
-center radius interaction.}
+\item{models}{an object of class \code{variogramModelList}. The user must
+specify at least two variogram models to fit (for center and radius).
+If less than three models are specified then the method does not fit a
+variogram for the center/radius interaction.}
 
-\item{...}{additional arguments to gstat::fit.variogram()}
+\item{...}{Additional arguments for \code{\link[gstat]{fit.variogram}}.}
 }
 \value{
-a list containing the parameters for each of the three (or two)
-fitted variograms.
+A list of variograms objects from the gstat package.
 }
 \description{
 Function to create a variogram object for interval-valued data.

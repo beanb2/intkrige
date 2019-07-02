@@ -205,15 +205,19 @@ setMethod("interval<-", "SpatialPointsDataFrame",
 
 # This method redefines how to print the intsp object to the screen.
 # Adapted from print generic in the sp package.
-#' Print the contents of an intsp object
+#' Print the contents of an \code{intsp} object
 #'
-#' This function extends print.sp by including a display and summary of the
-#' interval slot for the object.
+#' This function extends printing methods in the \code{sp} package
+#'   by including a display and summary of the interval slot for
+#'   the object.
 #'
-#' @param x an object of class intsp
-#' @param ... additional arguments to base::print
-#' @param digits default option from sp package
-#' @return nothing
+#' @param x An object of class \code{intsp}.
+#' @param ... Additional arguments to \code{\link{print}}.
+#' @param digits Determines how numbers are displayed on the screen.
+#'   Default option taken from \code{sp} package.
+#' @return Prints object to the screen, identical to
+#'   \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+#'   interval slot.
 #' @method print intsp
 #' @export
 print.intsp = function(x, digits = getOption("digits"), ...) {
@@ -231,7 +235,7 @@ print.intsp = function(x, digits = getOption("digits"), ...) {
   print(df, ..., digits = digits)
 }
 #' Extension of the show function for intgrd objects
-#' @param object and object of class intgrd
+#' @param object An object of class \code{intsp}.
 #' @method show intsp
 setMethod("show", "intsp", function(object) print.intsp(object))
 
@@ -239,18 +243,20 @@ setMethod("show", "intsp", function(object) print.intsp(object))
 # Adapted from sp package source code.
 # This method redefines how to print the heaf intsp object to the screen.
 # Adapted from sp package source code.
-#' Print the head of an intsp object.
+#' Print the head of an \code{intsp} object.
 #'
-#' This function extends print.sp by including a display and summary of the
-#' interval slot for the object.
+#' This function extends printing methods in the \code{sp} package
+#'   by including a display and summary of the head of the
+#'   interval slot for the object.
 #'
-#' @param x an object of class intsp
-#' @param n number of rows to print to the screen
-#' @param ... additional arguments to print
-#' @param digits determines how values are printed to the screen
-#' (default from sp package)
-#' @return nothing
-#'
+#' @param x An object of class \code{intsp}.
+#' @param n The number of rows to print to the screen.
+#' @param ... Additional arguments to \code{\link{print}}.
+#' @param digits Determines how values are printed to the screen (default
+#'   taken from sp package).
+#' @return Prints a subset of the object to the screen, identical to
+#'   \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+#'   interval slot.
 #' @method head intsp
 #' @export
 head.intsp <- function(x, n = 6, ..., digits = getOption("digits")) {
@@ -273,13 +279,14 @@ setMethod("head", "intsp", function(x, ...) head.intsp(x, ...))
 #' This function extends print.sp by including a display and summary of the
 #' interval slot for the object.
 #'
-#' @param x an object of class intsp
-#' @param n number of rows to print to the screen
-#' @param ... additional arguments to utils::tail()
-#' @param digits determines how numbers are displayed (default taken from
-#' package sp)
-#' @return nothing
-#'
+#' @param x An object of class \code{intsp}.
+#' @param n The number of rows to print to the screen.
+#' @param ... Additional arguments to \code{\link{tail}}.
+#' @param digits Determines how numbers are displayed (default taken from
+#'   sp package).
+#' @return Prints a subset of the object to the screen, identical to
+#'   \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+#'   interval slot.
 #' @method tail intsp
 #' @export
 tail.intsp = function(x, n = 6, ..., digits = getOption("digits")) {
@@ -298,12 +305,14 @@ setMethod("tail", "intsp", function(x, ...) tail.intsp(x, ...))
 
 # This method adapts the summary.spatial to include a covariance matrix
 # for the interval-center and radii in the output.
-#' Summarize the contents of an intsp object, including special summaries for
-#' the interval slot.
+#' Summarize the contents of an \code{intsp} object,
+#'   including special summaries for the interval slot.
 #'
-#' @param object an object of class intsp
-#' @param ... additional arguments to base::summary().
-#' @return nothing
+#' @param object An object of class \code{intsp}.
+#' @param ... Additional arguments to \code{\link{summary}}.
+#' @return Prints a series of summaries to the screen, identical to
+#'   \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+#'   interval slot.
 #' @method summary intsp
 #' @export
 summary.intsp = function(object, ...) {
@@ -326,9 +335,11 @@ setMethod("summary", "intsp", summary.intsp)
 # This method defines how intsp objects are printed to the screen.
 #' Print the object summary to the screen.
 #'
-#' @param x an object an object of class intsp
-#' @param ... additional arguments to base::print()
-#' @return nothing
+#' @param x An object an object of class \code{intsp}.
+#' @param ... Additional arguments to \code{\link{print}}.
+#' @return Prints a series of summaries to the screen, identical to
+#'   \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+#'   interval slot.
 #' @export
 print.summary.intsp = function(x, ...) {
   cat(paste("Object of class ", x[["class"]], "\n", sep = ""))
@@ -417,20 +428,22 @@ setMethod("as.data.frame", "intsp", function(x){
 
 #' Create an interval plot for spatial points.
 #'
-#' Calls the sp::spplot() function to plot the locations, centers, and
-#' radii of an interval-valued spatial data frame in a single figure.
-#' @param x an object of class intsp
-#' @param locationsOnly (intsp only) a boolean: TRUE calls plot.sp(x)
-#' @param legend.positions the positions of the center and radius legend
-#' relative to the plotting window
-#' @param cuts (intsp only) the number of ranges of values to print in the center and radius
-#' legend respectively
-#' @param radSize (intsp only) a vector of length 2 indicating the range of point sizes to
-#' plot to visualize radii magnitudes
-#' @param pch (intsp only) the shape of the points (see plot())
-#' @param alpha (intsp only) the transparency of the points
-#' @param ... additional arguments to sp::spplot()
-#' @method plot intsp,missing
+#' Calls \code{\link[sp]{spplot}} to plot the locations, centers, and
+#'   radii of an interval-valued spatial data frame in a single figure.
+#' @param x An object of class \code{intsp}.
+#' @param locationsOnly If TRUE, simply plots geographic
+#'   locations.
+#' @param legend.positions The positions of the center and radius legend
+#'   relative to the plotting window.
+#' @param cuts The number of ranges of values to print in
+#'   the center and radius legend respectively.
+#' @param radSize A vector of length 2 indicating the range
+#'   of point sizes to plot to visualize radii magnitudes.
+#' @param pch The shape of the points
+#'   (see \code{\link{plot}}).
+#' @param alpha The transparency of the points.
+#' @param ... Additional arguments to \code{\link[sp]{spplot}}.
+#' @method plot \code{intsp},missing
 setMethod("plot", signature = c("intsp", "missing"),
           function(x, locationsOnly = FALSE,
                    legend.positions = c("left", "right"),
@@ -444,7 +457,8 @@ setMethod("plot", signature = c("intsp", "missing"),
               return(test)
             }
 
-            if(length(legend.positions) != 2 | class(legend.positions) != "character"){
+            if(length(legend.positions) != 2 |
+               class(legend.positions) != "character"){
               stop("two character legend positions must be provided")
             }
             if(length(cuts) != 2 | class(cuts) != "numeric"){
@@ -461,7 +475,8 @@ setMethod("plot", signature = c("intsp", "missing"),
             x$center <- (x@interval[, 1] + x@interval[, 2]) / 2
             x$radius <- (x@interval[, 2] - x@interval[, 1]) / 2
 
-            # remove the interval slot and convert back to spatialpointsdataframe
+            # remove the interval slot and convert back
+            # to spatialpointsdataframe
             intkrige::interval(x) <- NULL
 
             # Determine the range of radius values.
@@ -475,7 +490,9 @@ setMethod("plot", signature = c("intsp", "missing"),
 
             key.rad <- list(title="radius",
                             points=list(pch=pch,
-                                        cex = seq(radSize[1], radSize[2], length = cuts[2]),
+                                        cex = seq(radSize[1],
+                                                  radSize[2],
+                                                  length = cuts[2]),
                                         col="black"),
                             text=list(levels(radCuts)),
                             cex.title=1.25)

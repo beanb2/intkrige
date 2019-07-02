@@ -214,10 +214,13 @@ setMethod("interval<-", "SpatialPixelsDataFrame",
 #' This function extends print.sp by including a display and summary of the
 #' interval slot for the object.
 #'
-#' @param x an object of class intgrd
-#' @param ... additional arguments to base::print
-#' @param digits default option from sp package
-#' @return nothing
+#' @param x An object of class \code{intgrd}.
+#' @param ... Additional arguments to \code{\link{print}}.
+#' @param digits Determines how numeric values are printed to the screen
+#'   (default from \code{sp} package).
+#' @return Prints object to the screen, identical to
+#'   \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+#'   interval slot.
 #' @method print intgrd
 #' @export
 print.intgrd = function(x, ..., digits = getOption("digits")) {
@@ -246,13 +249,14 @@ setMethod("show", "intgrd", function(object) print(object))
 #' This function extends print.sp by including a display and summary of the
 #' interval slot for the object.
 #'
-#' @param x an object of class intgrd
-#' @param n number of rows to print to the screen
-#' @param ... additional arguments to print
-#' @param digits determines how values are printed to the screen
-#' (default from sp package)
-#' @return nothing
-#'
+#' @param x An object of class \code{intgrd}.
+#' @param n Number of rows to print to the screen.
+#' @param ... Additional arguments to \code{print}.
+#' @param digits Determines how numeric values are printed to the screen
+#'   (default from \code{sp} package).
+#' @return Prints a subset of the object observations to the screen,
+#'   identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+#'   summary statistics for the interval slot.
 #' @method head intgrd
 #' @export
 head.intgrd = function(x, n = 6, ..., digits = getOption("digits")){
@@ -275,13 +279,14 @@ setMethod("head", "intgrd", function(x, ...) head.intgrd(x, ...))
 #' This function extends print.sp by including a display and summary of the
 #' interval slot for the object.
 #'
-#' @param x an object of class intgrd
-#' @param n number of rows to print to the screen
-#' @param ... additional arguments to utils::tail()
-#' @param digits determines how numbers are displayed (default taken from
-#' package sp)
-#' @return nothing
-#'
+#' @param x An object of class \code{intgrd}.
+#' @param n The number of rows to print to the screen.
+#' @param ... Additional arguments to \code{tail}.
+#' @param digits Determines how numbers are displayed to the screen
+#'   (default taken from package \code{sp}).
+#' @return Prints a subset of the object observations to the screen,
+#'   identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+#'   summary statistics for the interval slot.
 #' @method tail intgrd
 #' @export
 tail.intgrd = function(x, n = 6, ..., digits = getOption("digits")){
@@ -300,12 +305,14 @@ setMethod("tail", "intgrd", function(x, ...) tail.intgrd(x, ...))
 
 # This method adapts the summary.spatial to include a covariance matrix
 # for the interval-center and radii in the output.
-#' Summarize the contents of an intgrd object, including special summaries for
-#' the interval slot.
+#' Summarize the contents of an \code{intgrd} object,
+#' including special summaries for the interval slot.
 #'
-#' @param object an object of class intgrd
-#' @param ... additional arguments to base::summary().
-#' @return nothing
+#' @param object An object of class \code{intgrd}.
+#' @param ... Additional arguments to \code{\link{summary}}.
+#' @return Prints a summary of the object observations to the screen,
+#'   identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+#'   summary statistics for the interval slot.
 #' @method summary intgrd
 #'
 #' @export
@@ -329,9 +336,11 @@ setMethod("summary", "intgrd", summary.intgrd)
 # This method defines how intgrd objects are printed to the screen.
 #' Print the object summary to the screen.
 #'
-#' @param x an object an object of class intgrd
-#' @param ... additional arguments to print()
-#' @return nothing
+#' @param x An object of class \code{intgrd}.
+#' @param ... Additional arguments to \code{\link{print}}.
+#' @return Prints a subset of the object observations to the screen,
+#'   identical to \code{\link[sp]{SpatialPoints-class}}, as well as
+#'   summary statistics for the interval slot.
 #'
 #' @export
 print.summary.intgrd = function(x, ...) {
@@ -427,19 +436,22 @@ setMethod("as.data.frame", "intgrd", function(x){
 
 #' Create an interval plot for spatial grid.
 #'
-#' Calls the sp::spplot() function to plot the locations, centers, and
-#' radii of an interval-valued spatial data frame in a single figure.
+#' Calls \code{\link[sp]{spplot}} to plot the locations, centers, and
+#' radii of an \code{intgrd} object in a single figure.
 #'
-#' @param x an object of class intgrd
-#' @param beside if true, center and radius plotted side by side
+#' @param x An object of class \code{intgrd}.
+#' @param beside Tf true, center and radius plotted side by side
 #'  if false, center and radius are plotted in a single figure with the center
-#'  plotted using color and the radius plotted using circles circumsribed
+#'  plotted using color and the radius plotted using circles circumscribed
 #'  within each grid cell.
-#' @param circleCol if beside=TRUE, the color of the circles
-#'  that will be circumscribed within each grid cell
-#' @param minRad the value of the minimum value of the radius in the circles
-#'  drawn to represent the interval radii. Must be a number between 0 and 1.
-#' @param ... additional arguments to sp::spplot()
+#' @param circleCol If beside=TRUE, the color of the circles
+#'  that will be circumscribed within each grid cell.
+#' @param minRad The minimum value of the radius in the circles
+#'  drawn to represent the interval radii. Must be a number between 0 and 1
+#'  where approaching 0 results in a point being drawn in the center of the grid,
+#'  while approaching 1 results in every circle being circumscribed in their
+#'  respective grid cell (which is not very interesting).
+#' @param ... Additional arguments to \code{\link[sp]{spplot}}.
 #' @method plot intgrd,missing
 setMethod("plot",
           signature = c("intgrd", "missing"),

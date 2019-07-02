@@ -7,12 +7,14 @@
 \method{print}{summary.intsp}(x, ...)
 }
 \arguments{
-\item{x}{an object an object of class intsp}
+\item{x}{An object an object of class \code{intsp}.}
 
-\item{...}{additional arguments to base::print()}
+\item{...}{Additional arguments to \code{\link{print}}.}
 }
 \value{
-nothing
+Prints a series of summaries to the screen, identical to
+  \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+  interval slot.
 }
 \description{
 Print the object summary to the screen.

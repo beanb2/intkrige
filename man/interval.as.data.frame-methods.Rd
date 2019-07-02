@@ -12,10 +12,10 @@
 \S4method{as.data.frame}{intsp}(x)
 }
 \arguments{
-\item{x}{an object of class \'intsp\' or class \'intgrd\'}
+\item{x}{An object of class \code{intsp} or class \code{intgrd}.}
 }
 \value{
-an object of class 'data.frame'
+An object of class \code{data.frame}.
 }
 \description{
 Convert intgrd or intsp object back to a data frame

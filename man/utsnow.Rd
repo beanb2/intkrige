@@ -17,12 +17,7 @@
  \item{maxDL}{The upper endpoint of the design snow load interval (kpa)}
  \item{pointDL}{The original point-valued design snow load from the 2018 Utah Snow Load Study (kpa)}
 
- }
-
- @details
- The interval valued kriging analysis described in Bean et. al. (2019) analyzes this dataset on a
- log scale after removing the effect of elevation. An example of predictions using this workflow are
- found in the README.md file associated with this package.}
+ }}
 \usage{
 utsnow
 }
@@ -30,6 +25,11 @@ utsnow
 A dataset containing the interval-valued data used in the analysis
 of Bean et. at (2019). The 415 measurement locations
 included in the dataset are taken from Bean et. al. (2018).
+}
+\details{
+The interval valued kriging analysis described in Bean et. al. (2019) analyzes this dataset on a
+ log scale after removing the effect of elevation. An example of predictions using this workflow are
+ found in the README associated with this package.
 }
 \references{
 \insertRef{Bean2019-int}{intkrige}

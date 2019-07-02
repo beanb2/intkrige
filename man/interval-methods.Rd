@@ -14,10 +14,10 @@ interval(x)
 \S4method{interval}{intsp}(x)
 }
 \arguments{
-\item{x}{an object of class intsp or intgrd}
+\item{x}{An object of class intsp or intgrd.}
 }
 \value{
-A matrix containing the interval data
+A matrix containing the interval data.
 }
 \description{
 Function to extract the interval of an intsp or intgrd object

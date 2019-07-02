@@ -2,20 +2,22 @@
 % Please edit documentation in R/intsp-class.R
 \name{summary.intsp}
 \alias{summary.intsp}
-\title{Summarize the contents of an intsp object, including special summaries for
-the interval slot.}
+\title{Summarize the contents of an \code{intsp} object,
+  including special summaries for the interval slot.}
 \usage{
 \method{summary}{intsp}(object, ...)
 }
 \arguments{
-\item{object}{an object of class intsp}
+\item{object}{An object of class \code{intsp}.}
 
-\item{...}{additional arguments to base::summary().}
+\item{...}{Additional arguments to \code{\link{summary}}.}
 }
 \value{
-nothing
+Prints a series of summaries to the screen, identical to
+  \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+  interval slot.
 }
 \description{
-Summarize the contents of an intsp object, including special summaries for
-the interval slot.
+Summarize the contents of an \code{intsp} object,
+  including special summaries for the interval slot.
 }

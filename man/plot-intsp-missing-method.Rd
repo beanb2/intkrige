@@ -10,26 +10,28 @@
   radSize = c(0.1, 3), pch = 16, alpha = 0.5, ...)
 }
 \arguments{
-\item{x}{an object of class intsp}
+\item{x}{An object of class \code{intsp}.}
 
-\item{locationsOnly}{(intsp only) a boolean: TRUE calls plot.sp(x)}
+\item{locationsOnly}{If TRUE, simply plots geographic
+locations.}
 
-\item{legend.positions}{the positions of the center and radius legend
-relative to the plotting window}
+\item{legend.positions}{The positions of the center and radius legend
+relative to the plotting window.}
 
-\item{cuts}{(intsp only) the number of ranges of values to print in the center and radius
-legend respectively}
+\item{cuts}{The number of ranges of values to print in
+the center and radius legend respectively.}
 
-\item{radSize}{(intsp only) a vector of length 2 indicating the range of point sizes to
-plot to visualize radii magnitudes}
+\item{radSize}{A vector of length 2 indicating the range
+of point sizes to plot to visualize radii magnitudes.}
 
-\item{pch}{(intsp only) the shape of the points (see plot())}
+\item{pch}{The shape of the points
+(see \code{\link{plot}}).}
 
-\item{alpha}{(intsp only) the transparency of the points}
+\item{alpha}{The transparency of the points.}
 
-\item{...}{additional arguments to sp::spplot()}
+\item{...}{Additional arguments to \code{\link[sp]{spplot}}.}
 }
 \description{
-Calls the sp::spplot() function to plot the locations, centers, and
-radii of an interval-valued spatial data frame in a single figure.
+Calls \code{\link[sp]{spplot}} to plot the locations, centers, and
+  radii of an interval-valued spatial data frame in a single figure.
 }

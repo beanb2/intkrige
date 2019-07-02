@@ -2,21 +2,25 @@
 % Please edit documentation in R/intsp-class.R
 \name{print.intsp}
 \alias{print.intsp}
-\title{Print the contents of an intsp object}
+\title{Print the contents of an \code{intsp} object}
 \usage{
 \method{print}{intsp}(x, digits = getOption("digits"), ...)
 }
 \arguments{
-\item{x}{an object of class intsp}
+\item{x}{An object of class \code{intsp}.}
 
-\item{digits}{default option from sp package}
+\item{digits}{Determines how numbers are displayed on the screen.
+Default option taken from \code{sp} package.}
 
-\item{...}{additional arguments to base::print}
+\item{...}{Additional arguments to \code{\link{print}}.}
 }
 \value{
-nothing
+Prints object to the screen, identical to
+  \code{\link[sp]{SpatialPoints-class}}, as well as summary statistics for the
+  interval slot.
 }
 \description{
-This function extends print.sp by including a display and summary of the
-interval slot for the object.
+This function extends printing methods in the \code{sp} package
+  by including a display and summary of the interval slot for
+  the object.
 }

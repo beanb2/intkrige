@@ -9,22 +9,25 @@
   minRad = 0.25, ...)
 }
 \arguments{
-\item{x}{an object of class intgrd}
+\item{x}{An object of class \code{intgrd}.}
 
-\item{beside}{if true, center and radius plotted side by side
+\item{beside}{Tf true, center and radius plotted side by side
 if false, center and radius are plotted in a single figure with the center
-plotted using color and the radius plotted using circles circumsribed
+plotted using color and the radius plotted using circles circumscribed
 within each grid cell.}
 
-\item{circleCol}{if beside=TRUE, the color of the circles
-that will be circumscribed within each grid cell}
+\item{circleCol}{If beside=TRUE, the color of the circles
+that will be circumscribed within each grid cell.}
 
-\item{minRad}{the value of the minimum value of the radius in the circles
-drawn to represent the interval radii. Must be a number between 0 and 1.}
+\item{minRad}{The minimum value of the radius in the circles
+drawn to represent the interval radii. Must be a number between 0 and 1
+where approaching 0 results in a point being drawn in the center of the grid,
+while approaching 1 results in every circle being circumscribed in their
+respective grid cell (which is not very interesting).}
 
-\item{...}{additional arguments to sp::spplot()}
+\item{...}{Additional arguments to \code{\link[sp]{spplot}}.}
 }
 \description{
-Calls the sp::spplot() function to plot the locations, centers, and
-radii of an interval-valued spatial data frame in a single figure.
+Calls \code{\link[sp]{spplot}} to plot the locations, centers, and
+radii of an \code{intgrd} object in a single figure.
 }

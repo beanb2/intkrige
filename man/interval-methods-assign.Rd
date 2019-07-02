@@ -20,11 +20,11 @@ interval(x) <- value
 \S4method{interval}{SpatialPointsDataFrame}(x) <- value
 }
 \arguments{
-\item{x}{an object of class intsp or intgrd}
+\item{x}{An object of class intsp or intgrd.}
 
-\item{value}{either a character vector of length two specifying the column names
-which will occupy the interval slot. Or a matrix of two columns to fill
-the slot.}
+\item{value}{Either a character vector of length two specifying
+the column names which will occupy the interval slot. Or, a matrix
+of two columns to fill the slot.}
 }
 \description{
 Function to reassign the contents of the interval slot
