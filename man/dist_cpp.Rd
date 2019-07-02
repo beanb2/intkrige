@@ -23,7 +23,7 @@ A matrix of pairwise distances between each combination
 }
 \description{
 Calculation of Euclidean or geographic distance. Based on an adaptation of
-  \code{\link[fields]{rdist.earth}} in the fields package.
+  \code{rdist.earth} in the \code{fields} package.
   Uses earth radius = 6378.388 for great circle distance calculations.
 }
 \details{
