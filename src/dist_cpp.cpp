@@ -15,7 +15,7 @@
 //' Distance matrix calculation.
 //'
 //' Calculation of Euclidean or geographic distance. Based on an adaptation of
-//'   \code{\link[fields]{rdist.earth}} in the fields package.
+//'   \code{rdist.earth} in the \code{fields} package.
 //'   Uses earth radius = 6378.388 for great circle distance calculations.
 //' @param loc1 A two column matrix representing  the longitude/latitude
 //'   (i.e. x/y) coordinates of the first set of distances.
