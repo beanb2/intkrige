@@ -6,19 +6,18 @@
 \alias{_PACKAGE}
 \title{INTERVAL-VALUED KRIGING MODELS IN R}
 \description{
-An interval valued extension of ordinary and simple kriging.
+An interval-valued extension of ordinary and simple kriging.
     Optimization of the function is based on a generalized interval distance.
     This creates a non-differentiable cost function that requires a
     differentiable approximation to the absolute value function. This
     differentiable approximation is optimized using a Newton-Raphson algorithm
     with a penalty function to impose the constraints. Analyses in the package
-    are driven by the \code{\linkS4class{intsp}} and \code{\linkS4class{intgrd}} 
+    are driven by the 'intsp' and 'intgrd' 
     classes, 
     which are interval-valued extensions of
-    \code{\linkS4class{SpatialPointsDataFrame}} and 
-    \code{\linkS4class{SpatialPixelsDataFrame}} respectively. 
-    The package includes
-    many wrapper functions to functions in the gstat and sp packages.
+    'SpatialPointsDataFrame' and 'SpatialPixelsDataFrame' respectively. 
+    The package includes several wrappers to functions in the 
+    'gstat' and 'sp' packages.
 }
 \section{Functions}{
 

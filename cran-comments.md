@@ -9,4 +9,10 @@ ubuntu:  0 errors | 0 warnings | 0 notes
 
 * This is a new release.
 
-
+(7-2-2019)
+Fixed the license template and formatting issues in the description as 
+requested. 
+The paper outlining the method is currently under review. 
+As such, we cannot include a reference with a DOI in the description
+in this initial submission. We anticipate adding this reference to 
+future iterations of the package.   

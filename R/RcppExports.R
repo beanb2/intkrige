@@ -5,7 +5,7 @@
 #'
 #' Calculation of Euclidean or geographic distance. Based on an adaptation of
 #'   \code{rdist.earth} in the \code{fields} package.
-#'   Uses earth radius = 6378.388 for great circle distance calculations.
+#'   Uses earth radius = 6378.388 km for great circle distance calculations.
 #' @param loc1 A two column matrix representing  the longitude/latitude
 #'   (i.e. x/y) coordinates of the first set of distances.
 #' @param loc2 A two column matrix representing the longitude/latitude
