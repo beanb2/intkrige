@@ -275,7 +275,8 @@ arma::colvec newRap(arma::colvec lam, const arma::mat & pCovC,
     lam.elem(tindices) = lamUp;
 
     // Set elements of lambda close enough to 0, equal to 0
-    lam.elem( find(arma::abs(lam) <  threshold) ).zeros();
+    //lam.elem( find(arma::abs(lam) <  threshold) ).zeros();
+    lam.clean(threshold);
 
     tindices = find(lam);
 
@@ -336,7 +337,8 @@ arma::colvec newRap(arma::colvec lam, const arma::mat & pCovC,
       lam.elem(tindices) = lamUp;
 
       // Set elements of lambda close enough to 0, equal to 0
-      lam.elem( find(arma::abs(lam) <  threshold) ).zeros();
+      //lam.elem( find(arma::abs(lam) <  threshold) ).zeros();
+      lam.clean(threshold);
 
       tindices = find(lam);
 
@@ -464,7 +466,8 @@ arma::colvec newRap_long(arma::colvec lam, const arma::mat & pCovC,
       lam.elem(tindices) = lamUp;
 
       // Set elements of lambda close enough to 0, equal to 0
-      lam.elem( find(arma::abs(lam) <  threshold) ).zeros();
+      //lam.elem( find(arma::abs(lam) <  threshold) ).zeros();
+      lam.clean(threshold);
 
       tindices = find(lam);
 
@@ -609,7 +612,8 @@ arma::colvec newRap_2(arma::colvec lam, const arma::mat & pCovC,
       lam.elem(tindices) = lamUp;
 
       // Set elements of lambda close enough to 0, equal to 0
-      lam.elem( find(arma::abs(lam) < threshold) ).zeros();
+      //lam.elem( find(arma::abs(lam) < threshold) ).zeros();
+      lam.clean(threshold);
 
       tindices = find(lam);
 
@@ -724,7 +728,8 @@ arma::mat nrShell(const arma::mat & pCovC, const arma::mat & pCovR,
     // Don't let initial guesses be too close to 0.
     // This should help to avoid singularities.
     lam = arma::abs(lam);
-    lam.elem( find(lam < threshold) ).zeros();
+    //lam.elem( find(lam < threshold) ).zeros();
+    lam.clean(threshold); // replaces previous line
     lam.elem( find(lam == 0) ) += threshold;
 
     // If trend is not specified, use ordinary kriging.
