@@ -29,6 +29,39 @@
 #' \insertRef{Bean2018-report}{intkrige}
 "utsnow"
 
+#' An interval-valued design ground snow load dataset for Utah that only
+#'   considers depth to load conversions.
+#'
+#' A dataset containing the interval-valued data used in the analysis
+#' of Bean et. at (2019). The 415 measurement locations
+#' included in the dataset are taken from Bean et. al. (2018).
+#'
+#' @format A data frame with 415 rows and 8 variables:
+#'
+#'  \describe{
+#'  \item{STATION}{The global historical climatological network (GHCN)
+#'  station identifier}
+#'  \item{STATION_NAME}{The GHCN station name}
+#'  \item{LATITUDE}{Latitude coordinate position}
+#'  \item{LONGITUDE}{Longitude coordinate position}
+#'  \item{ELEVATION}{Elevation of the measurement location (meters)}
+#'  \item{minDL}{The lower endpoint of the interval-valued design snow load as measured in kilopascals (kpa)}
+#'  \item{maxDL}{The upper endpoint of the design snow load interval (kpa)}
+#'  \item{pointDL}{The original point-valued design snow load from the 2018 Utah Snow Load Study (kpa)}
+#'
+#'  }
+#'
+#' @details The interval valued kriging analysis described in Bean et. al. (2019) analyzes this dataset on a
+#'  log scale after removing the effect of elevation. An example of predictions using this workflow are
+#'  found in the README associated with this package. Note that this dataset differs from utsnow in that
+#'  intervals only consider differences in depth to load conversions.
+#'
+#' @references
+#' \insertRef{Bean2019-int}{intkrige}
+#'
+#' \insertRef{Bean2018-report}{intkrige}
+"utsnow_dtl"
+
 #' 30 year trimmed mean daily maximum and minimum temperatures for the
 #' Ohio river basin.
 #'
