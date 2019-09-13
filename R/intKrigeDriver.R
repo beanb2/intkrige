@@ -124,8 +124,8 @@ intkrige <- function(locations, newdata, models,
   if(class(locations) != "intsp"){
     stop("locations must be of class intsp")
   }
-  if(inherits(newdata, "SpatialPointsDataFrame") &&
-     inherits(newdata, "SpatialPixelsDataFrame")){
+  if(!inherits(newdata, "SpatialPoints") &&
+     !inherits(newdata, "SpatialPixels")){
     stop("newdata must inherit class SpatialPoints or
          SpatialPixels")
   }

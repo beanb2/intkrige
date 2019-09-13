@@ -1,6 +1,8 @@
 inst/doc
 # Ignore raw data files (too big to push)
 data-raw/
+# Ignore miscellanous test scripts.
+misc/
 
 # Ignore R history and profile files
 .Rhistory
