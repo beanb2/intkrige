@@ -4,10 +4,25 @@
 \alias{intkrige}
 \title{Algorithmic implementation of interval valued kriging.}
 \usage{
-intkrige(locations, newdata, models, formulas = list(center ~ 1, radius ~
-  1), eta = 0.75, A = c(1, 1, 0), trend = NULL, thresh = 100,
-  tolq = 0.001, maxq = 100, tolp = 0.001, maxp = 100, r = 1,
-  useR = TRUE, fast = FALSE, weights = FALSE, cores = 1)
+intkrige(
+  locations,
+  newdata,
+  models,
+  formulas = list(center ~ 1, radius ~ 1),
+  eta = 0.75,
+  A = c(1, 1, 0),
+  trend = NULL,
+  thresh = 100,
+  tolq = 0.001,
+  maxq = 100,
+  tolp = 0.001,
+  maxp = 100,
+  r = 1,
+  useR = TRUE,
+  fast = FALSE,
+  weights = FALSE,
+  cores = 1
+)
 }
 \arguments{
 \item{locations}{An object of class intsp, specifying the prediction

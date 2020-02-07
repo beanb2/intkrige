@@ -38,7 +38,55 @@ setMethod("$", "intsp",
 # Adapted from:
 # - https://github.com/edzer/sp/blob/master/R/Spatial-methods.R
 #' @name $<-
-#' @rdname assign-methods
+#' @rdname extract-methods
+#' @aliases $<-,intsp-method
+setMethod("$<-", "intsp",
+          function(x, name, value) {
+            if (name %in% sp::coordnames(x))
+              stop(paste(name,
+                         "is a coordinate name, please choose another name"))
+            # Addition for coordinate slot.
+            if (name %in% colnames(x@interval))
+              stop(paste(name, "is currently assigned to the interval slot,
+                         please choose another name"))
+            if (!("data" %in% slotNames(x))) {
+              df = list(value); names(df) = name
+              return(addAttrToGeom(x, data.frame(df), match.ID = FALSE))
+              # stop("no $<- method for object without attributes")
+            }
+            #if (is.list(value))
+            #	warning("assigning list or data.frame to attribute vector")
+            x@data[[name]] = value
+            x
+          }
+)
+
+# Method to properly subset and intsp object. The native functions fail to
+# subset the interval slot.
+#' @rdname extract-methods
+#' @aliases [,intsp-method
+setMethod("[", signature(x = "intsp",
+                         i = "ANY",
+                         j = "missing",
+                         drop = "missing"),
+          function(x, i, j, ..., drop) {
+            if (!("data" %in% slotNames(x)))
+              stop("no [ method for object without attributes")
+
+            # Subset the contents of each slot.
+            x@coords <- x@coords[i, ]
+            x@data <- x@data[i, ]
+            x@interval <- x@interval[i, ]
+            x
+          }
+)
+
+# This method stops users from editing the coordinates or intervals
+# using the standard "$" operator.
+# Adapted from:
+# - https://github.com/edzer/sp/blob/master/R/Spatial-methods.R
+#' @name $<-
+#' @rdname extract-methods
 #' @aliases $<-,intsp-method
 setMethod("$<-", "intsp",
           function(x, name, value) {
@@ -88,7 +136,7 @@ setMethod("interval<-", "intsp",
 
               return(x)
 
-            }else if(class(value) == "character"){
+            }else if(inherits(value, "character")){
 
               # If a character string is provided, then search the data frame
               # for the values to place in the interval slot.
@@ -104,8 +152,8 @@ setMethod("interval<-", "intsp",
               }
 
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" |
-                  class(x@data[, value[2]]) != "numeric") {
+              if (!inherits(x@data[, value[1]], "numeric") |
+                  !inherits(x@data[, value[2]], "numeric")) {
                 stop("non-numeric input detected")
               }
 
@@ -122,7 +170,7 @@ setMethod("interval<-", "intsp",
               colnames(x@interval) <- c(value[1], value[2])
 
               # If a matrix is input, allow the interval values to be replaced.
-            }else if(class(value) == "matrix"){
+            }else if(inherits(value, "matrix")){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
               if(nrow(value) != nrow(coordinates(x@coords)) |
@@ -160,10 +208,10 @@ setMethod("interval<-", "SpatialPointsDataFrame",
 
             x <- as(x, "intsp")
 
-            if(class(value) == "character"){
+            if(inherits(value, "character")){
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" |
-                  class(x@data[, value[1]]) != "numeric") {
+              if (!inherits(x@data[, value[1]], "numeric") |
+                  !inherits(x@data[, value[2]], "numeric") ) {
                 stop("non-numeric input detected")
               }
 
@@ -179,7 +227,7 @@ setMethod("interval<-", "SpatialPointsDataFrame",
               # Preserve the column names in the interval slot.
               colnames(x@interval) <- c(value[1], value[2])
 
-            }else if(class(value) == "matrix"){
+            }else if(inherits(value, "matrix")){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
               if(nrow(value) != nrow(coordinates(x@coords)) |
@@ -458,13 +506,13 @@ setMethod("plot", signature = c("intsp", "missing"),
             }
 
             if(length(legend.positions) != 2 |
-               class(legend.positions) != "character"){
+               !inherits(legend.positions, "character")){
               stop("two character legend positions must be provided")
             }
-            if(length(cuts) != 2 | class(cuts) != "numeric"){
+            if(length(cuts) != 2 | !inherits(cuts, "numeric")){
               stop("two numeric cut arguments must be provided")
             }
-            if(length(radSize) != 2 | class(radSize) != "numeric"){
+            if(length(radSize) != 2 | !inherits(radSize, "numeric")){
               stop("two numeric size arguments must be provided")
             }
             if(radSize[2] < radSize[1]){

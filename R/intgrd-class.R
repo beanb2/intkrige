@@ -46,7 +46,7 @@ setMethod("$", "intgrd",
 # - https://github.com/edzer/sp/blob/master/R/Spatial-methods.R
 
 #' @name $<-
-#' @rdname assign-methods
+#' @rdname extract-methods
 #' @aliases $<-,intgrd-method
 setMethod("$<-", "intgrd",
           function(x, name, value) {
@@ -65,6 +65,26 @@ setMethod("$<-", "intgrd",
             #if (is.list(value))
             #	warning("assigning list or data.frame to attribute vector")
             x@data[[name]] = value
+            x
+          }
+)
+
+# Method to properly subset and intsp object. The native functions fail to
+# subset the interval slot.
+#' @rdname extract-methods
+#' @aliases [,intgrd-method
+setMethod("[", signature(x = "intgrd",
+                         i = "ANY",
+                         j = "missing",
+                         drop = "missing"),
+          function(x, i, j, ..., drop) {
+            if (!("data" %in% slotNames(x)))
+              stop("no [ method for object without attributes")
+
+            # Subset the contents of each slot.
+            x@coords <- x@coords[i, ]
+            x@data <- x@data[i, ]
+            x@interval <- x@interval[i, ]
             x
           }
 )
@@ -94,7 +114,7 @@ setMethod("interval<-", "intgrd",
               x <- as(x, "SpatialPixelsDataFrame")
 
               return(x)
-            }else if(class(value) == "character"){
+            }else if(inherits(value, "character")){
               # If a character string is provided, then search the data frame
               # for the values to place in the interval slot.
               if(length(value) != 2){
@@ -109,8 +129,8 @@ setMethod("interval<-", "intgrd",
               }
 
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" |
-                  class(x@data[, value[1]]) != "numeric") {
+              if (!inherits(x@data[, value[1]], "numeric") |
+                  !inherits(x@data[, value[2]], "numeric")) {
                 stop("non-numeric input detected")
               }
 
@@ -127,7 +147,7 @@ setMethod("interval<-", "intgrd",
               colnames(x@interval) <- c(value[1], value[2])
 
               # If a matrix is input, allow the interval values to be replaced.
-            }else if(class(value) == "matrix"){
+            }else if(inherits(value, "matrix")){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
               if(nrow(value) != nrow(coordinates(x@coords)) |
@@ -164,10 +184,10 @@ setMethod("interval<-", "SpatialPixelsDataFrame",
 
             x <- as(x, "intgrd")
 
-            if(class(value) == "character"){
+            if(inherits(value, "character")){
               # Ensure that only numeric variables are placed in the interval
-              if (class(x@data[, value[1]]) != "numeric" |
-                  class(x@data[, value[1]]) != "numeric") {
+              if (!inherits(x@data[, value[1]], "numeric") |
+                  !inherits(x@data[, value[2]], "numeric")) {
                 stop("non-numeric input detected")
               }
 
@@ -183,7 +203,7 @@ setMethod("interval<-", "SpatialPixelsDataFrame",
               # Preserve the column names in the interval slot.
               colnames(x@interval) <- c(value[1], value[2])
 
-            }else if(class(value) == "matrix"){
+            }else if(inherits(value, "matrix")){
               # Ensure that the number of rows in the replacement
               # matches the number of rows expected.
               if(nrow(value) != nrow(coordinates(x@coords)) |

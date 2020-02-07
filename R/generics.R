@@ -75,29 +75,7 @@ setGeneric("intvariogram",
              standardGeneric("intvariogram"))
 #=============================================================================
 
-#=============================================================================
-# Documentation for generic functions.
-#' Atomic sub-setting of interval spatial objects.
-#'
-#' @param x An object of class \code{intsp} or class \code{intgrd}.
-#' @param name The variable name on which to subset. This variable name can be
-#'   located in the data, coordinates, or interval slot.
-#' @return The requested information from the data, coordinate,
-#'   or interval slot.
-#' @name $
-#' @rdname extract-methods
-NULL
-
-#' Atomic assignment of interval spatial objects.
-#'
-#' @param x An object of class \code{intsp} or class \code{intgrd}.
-#' @param name The variable name on which to subset. This variable name can be
-#'   located in the data, coordinates, or interval slot.
-#' @param value The new data used to replace the existing data in the desired slot.
-#' @name $<-
-#' @rdname assign-methods
-NULL
-
+#============================================================================
 #' Convert intgrd or intsp object back to a data frame
 #'
 #' @param x An object of class \code{intsp} or class \code{intgrd}.
@@ -105,6 +83,23 @@ NULL
 #' @name as.data.frame
 #' @rdname interval.as.data.frame-methods
 NULL
+
+#' Extract subset of an \code{intsp} or \code{intgrd} object
+#'
+#' @param x An object of class \code{intsp} or class \code{intgrd}
+#'   from which to replace elements.
+#' @param name Character vector corresponding to the name of the column that
+#'   will be extracted or replaced.
+#' @param i,j,... indices specifying elements to extract or replace. See
+#'   generic function documentation for details.
+#' @param drop The requested column that may be reassigned.
+#' @param value The new data used to replaced drop data in the desired slot.
+#' @return An object of class \code{intsp} or \code{intgrd}.
+#' @name extract
+#' @rdname extract-methods
+NULL
+
+
 
 
 

@@ -121,7 +121,7 @@ intkrige <- function(locations, newdata, models,
                      cores = 1){
   ### Error checks for for spatial objects
   #===========================================================================
-  if(class(locations) != "intsp"){
+  if(class(locations)[1] != "intsp"){
     stop("locations must be of class intsp")
   }
   if(!inherits(newdata, "SpatialPoints") &&
@@ -129,7 +129,7 @@ intkrige <- function(locations, newdata, models,
     stop("newdata must inherit class SpatialPoints or
          SpatialPixels")
   }
-  if(class(models) != "list" || length(models) < 2 || length(models) > 3){
+  if(class(models)[1] != "list" || length(models) < 2 || length(models) > 3){
     stop("models must be a list of 2-3 variograms")
   }
   if(class(models[[1]])[1] != "variogramModel" || class(models[[2]])[1] != "variogramModel"){
@@ -151,7 +151,7 @@ intkrige <- function(locations, newdata, models,
   if((thresh %% 1) > 0 || (maxp %% 1) > 0){
     stop("Max iteration parameters thresh and maxp must be integer valued.")
   }
-  if(class(A) != "numeric" || length(A) != 3){
+  if(!inherits(A, "numeric") || length(A) != 3){
     stop("A must be a numeric vector of length 3.")
   }else{
     if(A[3] >= max(A[1], A[2])){
@@ -167,7 +167,7 @@ intkrige <- function(locations, newdata, models,
       stop("Tolerance parameters must be strictly positive.")
     }
   }
-  if(class(cores) == "character"){
+  if(inherits(cores, "character")){
     if(cores != "all"){
       stop("Invalid cores specification. Must be an integer
            value or the character command \'all\'.")
@@ -224,8 +224,8 @@ intkrige <- function(locations, newdata, models,
             which requires the trend to be specified.\n
             Fast = TRUE is ignored.")
   }
-  if(class(useR) != "logical" || class(fast) != "logical" ||
-     class(weights) != "logical"){
+  if(!inherits(useR, "logical") || !inherits(fast, "logical") ||
+     !inherits(weights, "logical")){
     stop("Variables useR, fast, and weights must all
          be of class \'logical\'")
   }
@@ -330,14 +330,14 @@ intkrige <- function(locations, newdata, models,
   }
 
   # Determine if we need to create a data slot for the upper and lower enpoints.
-  if(class(newdata) == "SpatialPixels"){
+  if(class(newdata)[1] == "SpatialPixels"){
     newdata <-
       sp::SpatialPixelsDataFrame(newdata,
                                  data = data.frame(center = temp_predicts[, 1],
                                                    radius = temp_predicts[, 2],
                                                    kriging_variance = temp_predicts[, 3],
                                                    warn = temp_predicts[, 4]))
-  }else if(class(newdata) == "SpatialPoints"){
+  }else if(class(newdata)[1] == "SpatialPoints"){
     newdata <-
       sp::SpatialPointsDataFrame(newdata,
                                  data = data.frame(center = temp_predicts[, 1],
@@ -369,11 +369,17 @@ intkrige <- function(locations, newdata, models,
     # accomodates the fact that the formula is split in two
     # if parenthesis are present.
     temp_component <- as.character(formulas[[2]][[2]][[3]])
+    if(length(temp_component) == 2){
+      temp_component_char <- paste("(", temp_component[2], ")", sep = "")
+    }else{
+      warning("Radius scaling equation likely improperly inverted...")
+      temp_component_char <- temp_component[length(temp_component)]
+    }
     temp_predicts <-
       stats::model.frame(
-        stats::as.formula(paste("radius/(",
-                                temp_component[length(temp_component)],
-                                ")~1")), data = newdata)
+        stats::as.formula(paste("radius/",
+                                temp_component_char,
+                                "~1")), data = newdata)
     radius_final <- temp_predicts[, 1]
   }else{
     radius_final <- newdata$radius
