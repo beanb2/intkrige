@@ -12,9 +12,10 @@
 #'   intervals.
 #' @param models A list of variogram models of class vgm (see \link[gstat]{vgm})
 #'   When specified, the third model represents the center/radius interaction.
-#' @param formulas A list of two formulas specifying the centering and scaling
-#'   of the center and radius respectively. Limitations to these
-#'   formulas are specified in the details.
+#' @param centerFormula The formula describing the relationship between the radius center
+#'   and any number of explanatory variables. Must have "center" as the lone
+#'   dependent variable. Note that there is no option to fit an external
+#'   trend to the radius.
 #' @param eta A growth/shrink parameter for penalty term.
 #'   For simple kriging: eta > 1. For ordinary kriging: eta < 1.
 #' @param A vector of length three representing the weights
@@ -53,6 +54,9 @@
 #'   Parallel processing is only relevant if you are predicting
 #'   for more than one location.
 #'   Note there is no parallel option when useR = FALSE.
+#' @param progress (Not valid when useR=FALSE or in parallel):
+#'   Print a progress bar showing the progress of the predictions
+#'   at the new locations.
 #' @return A matrix with 4 columns where rows correspond to the prediction
 #'  locations and columns correspond to:
 #'
@@ -66,29 +70,24 @@
 #' (0 - no warning, 1 - warning)
 #'
 #' @details
-#' The formulas argument is current fairly limited in its use. For example
-#'   the center argument can accept no transformations of the dependent
-#'   variable. Similarly, the radius argument can accept no variable arguments
-#'   as independent variables. The idea behind this limited use of formulas is
-#'   that any transformations should be applied to the entire interval prior
-#'   to input into interval-valued kriging. This ensures that input into the
-#'   interval-valued kriging algorithm are well-defined intervals with
-#'   properly ordered upper and lower endpoints. The transformation that
-#'   are allowed within this function are linear shifts of the center, and
-#'   linear scaling of the radius.
-#'   Note that the scaling term for the radius can contain a division parameter
-#'   but it must be encapsulated in parenthesis and included on the right hand
-#'   side of the multiplication parameter.
+#' The centerFormula argument allows for an external trend to be fit to the
+#'   interval centers. No option is provided to scale the interval radii. This
+#'   means that any transformations should be applied to the entire interval
+#'   prior to input into interval-valued kriging. This ensures that input into
+#'   the interval-valued kriging algorithm are well-defined intervals with
+#'   properly ordered upper and lower endpoints.
+#'
 #' @useDynLib intkrige, .registration = TRUE
 #' @importFrom Rcpp evalCpp
+#' @importFrom stats predict
 #'
 #' @examples
 #' # First, define the location and elevation of interest.
 #' # (In this case we pick coordinates of Utah State University)
+#' tproj <- sp::CRS(SRS_string = "EPSG:4326")
 #' templocs <- data.frame(lat = 41.745, long = -111.810, ELEVATION = 1456)
 #' sp::coordinates(templocs) <- c("long", "lat")
-#' sp::proj4string(templocs) <- "+proj=longlat +ellps=WGS84
-#' +datum=WGS84 +no_defs +towgs84=0,0,0"
+#' sp::proj4string(templocs) <- tproj
 #'
 #' # Load the Utah Snow Load Data
 #' data(utsnow)
@@ -96,29 +95,28 @@
 #'
 #' # Convert to an 'intsp' object that inherits a SpatialPointsDataFrame
 #' sp::coordinates(utsnow.sp) <- c("LONGITUDE", "LATITUDE")
-#' sp::proj4string(utsnow.sp) <- sp::proj4string(templocs)
+#' sp::proj4string(utsnow.sp) <- tproj
 #' interval(utsnow.sp) <- c("minDL", "maxDL")
 #' # Define the formulas we will use to define the intervals.
-#' temp_formulas <- list(center ~ ELEVATION,
-#'                      radius*(ELEVATION/median(ELEVATION)) ~ 1)
+#' temp_formula <- center ~ ELEVATION
 #'
 #' # Define, fit and check the variogram fits.
 #' varios <- intvariogram(utsnow.sp,
-#'                        formulas = temp_formulas)
+#'                        centerFormula = temp_formula)
 #' varioFit <- fit.intvariogram(varios, models = gstat::vgm(c("Sph", "Sph", "Gau")))
 #' preds <- intkrige::intkrige(locations = utsnow.sp,
 #' newdata = templocs,
 #' models = varioFit,
-#' formulas = temp_formulas)
+#' centerFormula = temp_formula)
 #'
 #' @export
 intkrige <- function(locations, newdata, models,
-                     formulas = list(center ~ 1, radius ~ 1),
+                     centerFormula = center ~ 1,
                      eta = 0.75, A = c(1, 1, 0), trend = NULL,
                      thresh = 100, tolq = .001, maxq = 100,
                      tolp = .001, maxp = 100, r = 1, useR = TRUE,
                      fast = FALSE, weights = FALSE,
-                     cores = 1){
+                     cores = 1, progress = FALSE){
   ### Error checks for for spatial objects
   #===========================================================================
   if(class(locations)[1] != "intsp"){
@@ -190,30 +188,8 @@ intkrige <- function(locations, newdata, models,
   ### Formula Checks
   #===========================================================================
   # Check for the center formula:
-  if(as.character(formulas[[1]][[2]]) != "center"){
-    stop("no transformations currently accepted for center formula/n
-         changes can only be made to independent variables")
-  }
-  if(as.character(formulas[[2]][[3]]) != "1"){
-    stop("independent variables not currently accepted for radius forula\n
-         please leave right hand side of equation equal to 1")
-  }
-  if(length(formulas[[2]][[2]]) > 1){
-    if(length(formulas[[2]][[2]]) > 3){
-      stop("formula for radius can currently only accept one scaling argument")
-    }
-    if(as.character(formulas[[2]][[2]][[1]]) != "*"){
-      stop("currently only multiplication-based scalings are allowed")
-    }
-    if(as.character(formulas[[2]][[2]][[2]]) != "radius"){
-      stop("first argument of the dependent variable in the radius equation
-           must be the value \'radius\'")
-    }
-  }else{
-    if(as.character(formulas[[2]][[2]]) != "radius"){
-      stop("unless multiplication scaling is specified, dependent variable in
-           radius argument must be simply equal to \'radius\'")
-    }
+  if(all.vars(centerFormula)[1] != "center"){
+    stop("Formula must have center as the dependent variable.")
   }
   #===========================================================================
 
@@ -270,30 +246,34 @@ intkrige <- function(locations, newdata, models,
     pCovCR <- matrix(0, nrow = nrow(pCovC), ncol = ncol(pCovC))
     lCovCR <- matrix(0, nrow = nrow(lCovC), ncol = ncol(lCovC))
   }
+
+  # Create non interval version of the dataset:
+  locations2 <- locations
+  interval(locations2) <- NULL
+
   # Remove any linear trends in the interval data.
-  if(as.character(formulas[[1]][[3]]) != "1"){
-    templm <- stats::lm(formulas[[1]], data = as.data.frame(locations))
-    center_inputs <- templm$residuals
+  if(length(labels(stats::terms(centerFormula))) > 0){
+    templm <- gstat::gstat(NULL, "center",
+                           formula = centerFormula,
+                           data = locations2,
+                           model = models[[1]])
+    tpred <- predict(templm, newdata = locations2, BLUE = TRUE)
+    center_inputs <- locations$center - tpred@data$center.pred
+    lma <- TRUE
   }else{
     center_inputs <- locations$center
+    lma <- FALSE
   }
 
-  # Scale radii as requested.
-  if(length(formulas[[2]][[2]]) > 1){
-    temp_model <- stats::model.frame(formulas[[2]], data = locations)
-    radius_inputs <- temp_model[, 1]
-  }else{
-    radius_inputs <- locations$radius
-  }
-
-  measurements <- matrix(c(center_inputs, radius_inputs),
+  measurements <- matrix(c(center_inputs, locations$radius),
                          ncol = 2, byrow = FALSE)
 
   # Prepare the inputs.
   if(useR){
     predicts <- nrShell_R(pCovC, pCovR, pCovCR, lCovC, lCovR, lCovCR,
                           measurements, eta, trend, A, thresh, tolq,
-                          maxq, tolp, maxp, r, fast, weights, cores)
+                          maxq, tolp, maxp, r, fast, weights, cores,
+                          progress)
   }else{
     if(cores > 1){
       warning("Parallel processing not compatible with useR = FALSE.\n
@@ -354,45 +334,18 @@ intkrige <- function(locations, newdata, models,
     newdata$warn <- temp_predicts[, 4]
   }
 
-  # Transform back to original units and fill the interval slot.
-  if(as.character(formulas[[1]][[3]]) != "1"){
-    temp_predicts <- stats::predict(templm, newdata = as.data.frame(newdata))
-    center_final <- temp_predicts + newdata$center
+  # Transform back to original units and fill the interval slot if a linear model was fit.
+  if(lma){
+    temp_predicts <- predict(templm, newdata = newdata, BLUE = TRUE)
+    center_final <- temp_predicts$center.pred + newdata$center
   }else{
     center_final <- newdata$center
   }
 
-  # Undo radii scaling
-  if(length(formulas[[2]][[2]]) > 1){
-    # Extract the component we want to reverse.
-    # The use of length(temp_component) in the following lines
-    # accomodates the fact that the formula is split in two
-    # if parenthesis are present.
-    temp_component <- as.character(formulas[[2]][[2]][[3]])
-    if(length(temp_component) == 2){
-      temp_component_char <- paste("(", temp_component[2], ")", sep = "")
-    }else{
-      warning("Radius scaling equation likely improperly inverted...")
-      temp_component_char <- temp_component[length(temp_component)]
-    }
-    temp_predicts <-
-      stats::model.frame(
-        stats::as.formula(paste("radius/",
-                                temp_component_char,
-                                "~1")), data = newdata)
-    radius_final <- temp_predicts[, 1]
-  }else{
-    radius_final <- newdata$radius
-  }
-
 
   # Create interval-valued spatial object
-  lower <- center_final - radius_final
-  upper <- center_final + radius_final
-
-  newdata$lower = lower
-  newdata$upper = upper
-
+  newdata$lower <- center_final - newdata$radius
+  newdata$upper <- center_final + newdata$radius
 
   interval(newdata) <- c("lower", "upper")
 

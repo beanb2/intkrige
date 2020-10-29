@@ -370,7 +370,12 @@ summary.intsp = function(object, ...) {
   obj[["is.projected"]] = sp::is.projected(object)
   obj[["proj4string"]] = object@proj4string@projargs
   # Add the covariance matrix for center/radius interaction.
-  obj[["vcov"]] <- stats::cov(intkrige::interval(object))
+  obj[["vcov"]] <- stats::cov(
+    data.frame(
+      center = (intkrige::interval(object)[, 2] + intkrige::interval(object)[, 1]) / 2,
+      radius = (intkrige::interval(object)[, 2] - intkrige::interval(object)[, 1]) / 2
+      )
+    )
   obj[["itvl"]] <- summary(intkrige::interval(object))
   obj[["npoints"]] = nrow(object@coords)
   if ("data" %in% slotNames(object) & ncol(object@data) > 0)
@@ -431,32 +436,25 @@ print.summary.intsp = function(x, ...) {
 #' @rdname intvariogram-methods
 #' @aliases intvariogram,intsp-method
 setMethod("intvariogram", "intsp",
-          function(x, formulas = list(center ~ 1, radius ~ 1), ...){
-            # First ensure that the center and
-            # radius are included in the proper formulas
+          function(x, centerFormula = center ~ 1, ...){
+            # First ensure that the center formula is properly formatted.
             # (When strings are converted to strings, mathematical operators
             # act as a string split. Because we simply need "center" and
             # "radius" to appear somewhere in the text, we use the "any"
             # function to return one logical)
             check1 <- any(regexpr(pattern = "center",
-                                  text = formulas[[1]][[2]]) > 0)
-            check2 <- any(regexpr(pattern = "radius",
-                                  text = formulas[[2]][[2]]) > 0)
+                                  text = centerFormula[[2]]) > 0)
 
             if(!check1){
               stop("Formula one must contain \'center\'
-         in the dependent variable slot.")
-            }
-            if(!check2){
-              stop("Formula two must contain \'radius\'
          in the dependent variable slot.")
             }
 
             x$center <- (intkrige::interval(x)[, 1] + intkrige::interval(x)[, 2]) / 2
             x$radius <- (intkrige::interval(x)[, 2] - intkrige::interval(x)[, 1]) / 2
 
-            g1 <- gstat::gstat(NULL, "center", formula = formulas[[1]], data = x)
-            g2 <- gstat::gstat(g1, "radius", formula = formulas[[2]], data = x)
+            g1 <- gstat::gstat(NULL, "center", formula = centerFormula, data = x)
+            g2 <- gstat::gstat(g1, "radius", formula = radius ~ 1, data = x)
 
             gv <- gstat::variogram(g2, ...)
 

@@ -5,7 +5,8 @@
 \alias{utsnow_dtl}
 \title{An interval-valued design ground snow load dataset for Utah that only
   considers depth to load conversions.}
-\format{A data frame with 415 rows and 8 variables:
+\format{
+A data frame with 415 rows and 8 variables:
 
  \describe{
  \item{STATION}{The global historical climatological network (GHCN)
@@ -18,7 +19,8 @@
  \item{maxDL}{The upper endpoint of the design snow load interval (kpa)}
  \item{pointDL}{The original point-valued design snow load from the 2018 Utah Snow Load Study (kpa)}
 
- }}
+ }
+}
 \usage{
 utsnow_dtl
 }

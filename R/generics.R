@@ -62,8 +62,8 @@ setGeneric("interval<-",
 #' Function to fit empirical variograms for an interval-valued spatial object
 #'
 #' @param x An object of class intsp or intgrd.
-#' @param formulas A list of length two specifying the formulas related to the
-#'   centers and radii respectively.
+#' @param centerFormula A formula specifying any external trends for the
+#'   interval centers.
 #' @param ... Additional arguments for sp::variogram().
 #' @return An object of class 'intvariogram' containing empirical variograms
 #'   for the center, radius, and center/radius interaction.
@@ -71,7 +71,7 @@ setGeneric("interval<-",
 #' @rdname intvariogram-methods
 #' @exportMethod intvariogram
 setGeneric("intvariogram",
-           function(x, formulas = list(center ~ 1, radius ~ 1), ...)
+           function(x, centerFormula = center ~ 1, ...)
              standardGeneric("intvariogram"))
 #=============================================================================
 

@@ -6,17 +6,17 @@
 \alias{intvariogram,intsp-method}
 \title{Function to fit empirical variograms for an interval-valued spatial object}
 \usage{
-intvariogram(x, formulas = list(center ~ 1, radius ~ 1), ...)
+intvariogram(x, centerFormula = center ~ 1, ...)
 
-\S4method{intvariogram}{intgrd}(x, formulas = list(center ~ 1, radius ~ 1), ...)
+\S4method{intvariogram}{intgrd}(x, centerFormula = center ~ 1, ...)
 
-\S4method{intvariogram}{intsp}(x, formulas = list(center ~ 1, radius ~ 1), ...)
+\S4method{intvariogram}{intsp}(x, centerFormula = center ~ 1, ...)
 }
 \arguments{
 \item{x}{An object of class intsp or intgrd.}
 
-\item{formulas}{A list of length two specifying the formulas related to the
-centers and radii respectively.}
+\item{centerFormula}{A formula specifying any external trends for the
+interval centers.}
 
 \item{...}{Additional arguments for sp::variogram().}
 }

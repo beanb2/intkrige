@@ -22,8 +22,7 @@ test_that("prediction for sample case is as expected (c++ version)", {
   interval(utsnow.sp) <- log(interval(utsnow.sp))
 
   # Define the formulas we will use to define the intervals.
-  temp_formulas <- list(center ~ ELEVATION,
-                        radius*(ELEVATION/median(ELEVATION)) ~ 1)
+  temp_formulas <- center ~ ELEVATION
 
   # Define, fit and check the variogram fits.
   varios <- intvariogram(utsnow.sp,
@@ -33,11 +32,11 @@ test_that("prediction for sample case is as expected (c++ version)", {
   preds <- intkrige::intkrige(locations = utsnow.sp,
                               newdata = templocs,
                               models = varioFit,
-                              formulas = temp_formulas)
+                              centerFormula = temp_formulas)
   preds2 <- intkrige::intkrige(locations = utsnow.sp,
                               newdata = templocs,
                               models = varioFit,
-                              formulas = temp_formulas, useR = FALSE)
+                              centerFormula = temp_formulas, useR = FALSE)
 
 
   target <- data.frame(lower = -0.0361, upper = 0.9703)

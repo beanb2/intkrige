@@ -24,13 +24,17 @@
 # - r      - initial (and somewhat large) penalty parmater that ensures
 #            intitial solutions resides in feasible region. Used for
 #            ordinary kriging only.
+# - fast   - Use a simplified convergence approach for simple kriging.
+# - weights - retain and print weights in the output.
+# - cores   - number of cores (requires parallel computing)
+# - progress - print a progress bar to the screen.
 # Outputs:
 # - predicts - A two column matrix representing the centers and radii at each
 #            - resective location of interest.
 # ============================================================================
 nrShell_R = function(pCovC, pCovR, pCovCR, lCovC, lCovR, lCovCR,
                      measurements, eta, ctrend, A, thresh, tolq, maxq,
-                     tolp, maxp, r, fast, weights, cores){
+                     tolp, maxp, r, fast, weights, cores, progress){
 
   # Make predictions at each prediction location.
   predictionC <- predictionR <- predVar <- vector("numeric", ncol(lCovC))
@@ -60,26 +64,27 @@ nrShell_R = function(pCovC, pCovR, pCovCR, lCovC, lCovR, lCovCR,
     cl <- parallel::makeCluster(cores)
     doParallel::registerDoParallel(cl)
 
-    # If this function fails, we need to make sure to close the parallel connection.
-    predictionCR <- try({foreach::foreach(i = 1:ncol(lCovC),
-                                     .combine = rbind,
-                                     #.packages = "intkrige",
-                                     .export = c("optimShell",
-                                                 "newRap_2_R",
-                                                 "newRap_long_R",
-                                                 "newRap_R",
-                                                 "nrstep_2_R",
-                                                 "nrStep_long_R",
-                                                 "nrStep_R")) %dopar%
-                                       optimShell(pCovC, pCovR,
-                                                  pCovCR, lCovC[, i],
-                                                  lCovR[, i], lCovCR[, i],
-                                                  measurements, eta,
-                                                  ctrend, A,
-                                                  threshold, tolq,
-                                                  maxq, tolp,
-                                                  maxp, r,
-                                                  fast, weights)})
+      # If this function fails, we need to make sure to close the parallel connection.
+      predictionCR <- try({foreach::foreach(i = 1:ncol(lCovC),
+                                            .combine = rbind,
+                                            #.packages = "intkrige",
+                                            .export = c("optimShell",
+                                                        "newRap_2_R",
+                                                        "newRap_long_R",
+                                                        "newRap_R",
+                                                        "nrstep_2_R",
+                                                        "nrStep_long_R",
+                                                        "nrStep_R")) %dopar%
+                                                          optimShell(pCovC, pCovR,
+                                                                     pCovCR, lCovC[, i],
+                                                                     lCovR[, i], lCovCR[, i],
+                                                                     measurements, eta,
+                                                                     ctrend, A,
+                                                                     threshold, tolq,
+                                                                     maxq, tolp,
+                                                                     maxp, r,
+                                                                     fast, weights)})
+
 
     # Close the parallel connection even if the function fails.
     if(inherits(predictionCR, "try-error")){
@@ -95,11 +100,22 @@ nrShell_R = function(pCovC, pCovR, pCovCR, lCovC, lCovR, lCovCR,
   }else{ # If not in parallel, compute the usual way.
 
     predictionCR <- matrix(0, nrow = ncol(lCovC), ncol = tcol)
-    for(i in 1:ncol(lCovC)){
-      predictionCR[i, ] <- optimShell(pCovC, pCovR, pCovCR, lCovC[, i], lCovR[, i],
-                                      lCovCR[, i], measurements, eta, ctrend, A,
-                                      threshold, tolq, maxq, tolp, maxp, r,
-                                      fast, weights)
+    if(progress){
+      pb <- txtProgressBar(0, ncol(lCovC), style = 3)
+      for(i in 1:ncol(lCovC)){
+        predictionCR[i, ] <- optimShell(pCovC, pCovR, pCovCR, lCovC[, i], lCovR[, i],
+                                        lCovCR[, i], measurements, eta, ctrend, A,
+                                        threshold, tolq, maxq, tolp, maxp, r,
+                                        fast, weights)
+        setTxtProgressBar(pb, i)
+      }
+    }else{
+      for(i in 1:ncol(lCovC)){
+        predictionCR[i, ] <- optimShell(pCovC, pCovR, pCovCR, lCovC[, i], lCovR[, i],
+                                        lCovCR[, i], measurements, eta, ctrend, A,
+                                        threshold, tolq, maxq, tolp, maxp, r,
+                                        fast, weights)
+      }
     }
   }
 

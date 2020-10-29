@@ -5,7 +5,8 @@
 \alias{ohtemp}
 \title{30 year trimmed mean daily maximum and minimum temperatures for the
 Ohio river basin.}
-\format{A data frame with 161 rows and 8 variables:
+\format{
+A data frame with 161 rows and 8 variables:
 
  \describe{
  \item{ID}{The global historical climatological network (GHCN)
@@ -18,7 +19,8 @@ Ohio river basin.}
  \item{minm}{The 30 year mean daily minimum temperature (tenths of degrees Celsius)}
  \item{maxm}{The 30 year mean daily maximum temperature (tenths of degrees Celsius)}
 
- }}
+ }
+}
 \usage{
 ohtemp
 }
