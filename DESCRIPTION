@@ -13,7 +13,7 @@ Description: An interval-valued extension of ordinary and simple kriging.
     'SpatialPointsDataFrame' and 'SpatialPixelsDataFrame' respectively. 
     The package includes several wrappers to functions in the 
     'gstat' and 'sp' packages.
-Version: 1.0.1
+Version: 1.0.2
 Date: 2020-02-07
 Authors@R: person("Brennan", "Bean", email = "brennan.bean@usu.edu",
     role = c("aut", "cre"))
@@ -21,11 +21,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    Rcpp (>= 1.0.0), 
-    Rdpack, 
+    Rcpp,
+    Rdpack,
     methods,
-    stats, 
-    utils,
+    stats,
+    utils
 Suggests: 
     doParallel,
     foreach,

@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // dist_cpp
 arma::mat dist_cpp(const arma::mat& loc1, const arma::mat& loc2, const bool& geographic);
 RcppExport SEXP _intkrige_dist_cpp(SEXP loc1SEXP, SEXP loc2SEXP, SEXP geographicSEXP) {
