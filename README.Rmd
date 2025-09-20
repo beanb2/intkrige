@@ -8,7 +8,7 @@ bibliography: inst/REFERENCES.bib
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/beanb2/intkrige/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/beanb2/intkrige/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
-
+d
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 ```
 # intkrige
 
-This package implements the interval-valued kriging models described in Bean et. al. [-@Bean2019-int]. Details regarding the algorithmic implementation can be found in Bean et. al. [-@Bean2019-int2].
+This package implements the interval-valued kriging models described in Bean et. al. [-@Bean2019-int].
 
 ## Installation
 
@@ -100,27 +100,26 @@ interval(utsnow.sp) <- log(interval(utsnow.sp))
 
 
 ## Fitting variograms
-Next, we demonstrate how to create and fit empirical variograms. The functions that accomplish this task are fairly shallow wrappers to the functions in the gstat package. These function in the intkrige package simplify the workflow by fitting the center, radius, and center/radius variograms using the information contained in the interval slot. The *intvariogram* function defines the empirical variograms, while the *fit.intvariogram* function automatically fits variograms to the output of *intvariogram*. Note that intvariogram defines an *intvariogram* class which is the only class that fit.intvariogram will accept. This new class designation is intended to ensure that *intvariogram* and *fit.intvariogram* are always used in tandem. These particular variograms first account for the effect of elevation on ground snow loads before calculating the empirical variograms. 
+Next, we demonstrate how to create and fit empirical variograms. The functions that accomplish this task are fairly shallow wrappers to the functions in the gstat package. These function in the intkrige package simplify the workflow by fitting the center, radius, and center/radius variograms using the information contained in the interval slot. The *intvariogram* function defines the empirical variograms, while the *fit.intvariogram* function automatically fits variograms to the output of *intvariogram*. Note that intvariogram defines an *intvariogram* class which is the only class that fit.intvariogram will accept. This new class designation is intended to ensure that *intvariogram* and *fit.intvariogram* are always used in tandem. Note that the cross variogram for the center/radius interaction has a degenerate fit in this case. 
 ```{r varioCheck2}
 # Define the formulas we will use to define the intervals. 
-temp_formulas <- list(center ~ ELEVATION, 
-                      radius*(ELEVATION/median(ELEVATION)) ~ 1)
+temp_formulas <- center ~ ELEVATION
 
 # Define, fit and check the variogram fits. 
 varios <- intvariogram(utsnow.sp,
-                       formulas = temp_formulas)
+                       centerFormula = temp_formulas)
 varioFit <- fit.intvariogram(varios, models = gstat::vgm(c("Sph", "Sph", "Gau")))
 intvCheck(varios, varioFit)
 ```
 
 
 ## Interval-valued kriging models
-With variograms defined for each component of the interval, we are now ready to make interval-valued predictions using our interval-valued kriging models. If you explore the function documentation, you will notice that many of the function arguments relate to the Newton-Raphson optimization technique that is used to calculate the kriging model weights. These arguments should not need to be changed from the defaults for most user purposes. The following demonstrates an ordinary kriging model after accounting for elevation. 
+With variograms defined for each component of the interval, we are now ready to make interval-valued predictions using our interval-valued kriging models. If you explore the function documentation, you will notice that many of the function arguments relate to the Newton-Raphson optimization technique that is used to calculate the kriging model weights. These arguments should not need to be changed from the defaults for most user purposes. The following demonstrates an ordinary kriging model after accounting for elevation in the prediction of the centers. 
 ```{r prediction}
 preds <- intkrige::intkrige(locations = utsnow.sp,
                             newdata = templocs, 
                             models = varioFit,
-                            formulas = temp_formulas)
+                            centerFormula = temp_formulas)
 
 # The final results are predicted intervals after removing the effect of elevation.  
 preds

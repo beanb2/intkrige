@@ -1,11 +1,14 @@
 ## Test environments
-* windows 10, R 3.6.2
-* ubuntu 16.04.6 (on travis-ci), R 3.6.2
+* windows 11, R 4.5.1
+* github actions check standard (5 OS - all running R 4.5.1)
 
-## R CMD check results (2-7-2020)
+## R CMD check results (9-29-2025)
+Clean on all five OS. 
 
-* windows: 0 errors | 0 warnings | 0 notes
-* ubuntu:  0 errors | 0 warnings | 0 notes 
+(9-20-2025)
+Remove c++11 requirement. Update testthat file to check for relative
+dependency among the methods to avoid instability in the automatic variogram
+fitting process.
 
 (2-7-2020)
 This update is in response to a request I received from CRAN to remove 

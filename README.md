@@ -1,14 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-[![Travis build
-status](https://travis-ci.org/beanb2/intkrige.svg?branch=master)](https://travis-ci.org/beanb2/intkrige)
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/beanb2/intkrige/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/beanb2/intkrige/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end --> d
 
 # intkrige
 
 This package implements the interval-valued kriging models described in
-Bean et. al. (2019a). Details regarding the algorithmic implementation
-can be found in Bean et. al. (2019b).
+Bean et. al. (2022).
 
 ## Installation
 
@@ -58,8 +59,8 @@ with dataset documentation obtained by
 
 Once installed, this package runs simple and ordinary interval-valued
 kriging models. The following example comes from the design ground snow
-load application described in Bean et. al. (Bean, Sun, and Maguire
-2019a). The snow load problem requires a proper consideration of the
+load application described in Bean et. al. (Bean, Sun, and Maguire
+2022). The snow load problem requires a proper consideration of the
 effect of elevation on ground snow loads prior to input into kriging.
 The current interval-valued kriging models allow for linear
 considerations of secondary variables in the model predictions. Such
@@ -91,9 +92,6 @@ are created using the *interval()* function as demonstrated below.
 library(intkrige)
 #> Loading required package: sp
 #> Loading required package: gstat
-#> Registered S3 method overwritten by 'xts':
-#>   method     from
-#>   as.zoo.xts zoo
 #> Loading required package: raster
 
 # First, define the location and elevation of interest. 
@@ -142,19 +140,20 @@ variograms using the information contained in the interval slot. The
 of *intvariogram*. Note that intvariogram defines an *intvariogram*
 class which is the only class that fit.intvariogram will accept. This
 new class designation is intended to ensure that *intvariogram* and
-*fit.intvariogram* are always used in tandem. These particular
-variograms first account for the effect of elevation on ground snow
-loads before calculating the empirical variograms.
+*fit.intvariogram* are always used in tandem. Note that the cross
+variogram for the center/radius interaction has a degenerate fit in this
+case.
 
 ``` r
 # Define the formulas we will use to define the intervals. 
-temp_formulas <- list(center ~ ELEVATION, 
-                      radius*(ELEVATION/median(ELEVATION)) ~ 1)
+temp_formulas <- center ~ ELEVATION
 
 # Define, fit and check the variogram fits. 
 varios <- intvariogram(utsnow.sp,
-                       formulas = temp_formulas)
+                       centerFormula = temp_formulas)
 varioFit <- fit.intvariogram(varios, models = gstat::vgm(c("Sph", "Sph", "Gau")))
+#> Warning in gstat::fit.variogram(x_sub, model = models[[i]], ...): No
+#> convergence after 200 iterations: try different initial values?
 intvCheck(varios, varioFit)
 ```
 
@@ -169,72 +168,70 @@ notice that many of the function arguments relate to the Newton-Raphson
 optimization technique that is used to calculate the kriging model
 weights. These arguments should not need to be changed from the defaults
 for most user purposes. The following demonstrates an ordinary kriging
-model after accounting for elevation.
+model after accounting for elevation in the prediction of the centers.
 
 ``` r
 preds <- intkrige::intkrige(locations = utsnow.sp,
                             newdata = templocs, 
                             models = varioFit,
-                            formulas = temp_formulas)
+                            centerFormula = temp_formulas)
+#> [generalized least squares trend estimation]
+#> [generalized least squares trend estimation]
 
 # The final results are predicted intervals after removing the effect of elevation.  
 preds
-#>         coordinates                 interval ELEVATION   center    radius
-#> 1 (-111.81, 41.745) [-0.03611231, 0.9702524]      1456 0.433943 0.5031823
+#>         coordinates               interval ELEVATION    center    radius
+#> 1 (-111.81, 41.745) [-0.1769736, 1.030301]      1456 0.6757244 0.6036374
 #>   kriging_variance warn
-#> 1        0.1517327    0
+#> 1        0.1651463    0
 ```
 
 The interval prediction (including the elevation effect) is included in
 the interval slot. The raw predictions are appended to the data frame
 under the following variable names:
 
-\-center: the value of the interval centers returned directly from the
+-center: the value of the interval centers returned directly from the
 kriging model,
 
-\-radius: raw radii predictions,
+-radius: raw radii predictions,
 
-\-variance: the kriging variance according the generalized L2 distance,
+-variance: the kriging variance according the generalized L2 distance,
 
-\-warn: a boolean that is 0 for a convergent optimization and 1 for a
+-warn: a boolean that is 0 for a convergent optimization and 1 for a
 non-convergent optimization. This quiet approach to warnings ensures a
 non-disruptive experience for the user when predicting a large number of
 locations.
 
 # References
 
-<div id="refs" class="references">
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
 
-<div id="ref-Bean2019-int">
+<div id="ref-Bean2019-int" class="csl-entry">
 
-Bean, Brennan, Yan Sun, and Marc Maguire. 2019a. “Interval-Valued
-Kriging Models for Geostatistical Mapping with Uncertain Inputs.”
-
-</div>
-
-<div id="ref-Bean2019-int2">
-
-———. 2019b. “Supplement to ‘Interval-Valued Kriging Models for
-Geostatistical Mapping with Uncertain Inputs’.”
+Bean, Brennan, Yan Sun, and Marc Maguire. 2022. “Interval-Valued Kriging
+for Geostatistical Mapping with Imprecise Inputs.” *International
+Journal of Approximate Reasoning* 140: 31–51.
+<https://doi.org/10.1016/j.ijar.2021.10.003>.
 
 </div>
 
-<div id="ref-Bivand2008">
+<div id="ref-Bivand2008" class="csl-entry">
 
 Bivand, Roger S, Edzer J Pebesma, Virgilio Gomez-Rubio, and Edzer Jan
-Pebesma. 2013. *Applied Spatial Data Analysis with R*. 2nd ed. Vol.
+Pebesma. 2013. *Applied Spatial Data Analysis with r*. 2nd ed. Vol.
 747248717. Springer.
 
 </div>
 
-<div id="ref-Goovaerts1997">
+<div id="ref-Goovaerts1997" class="csl-entry">
 
 Goovaerts, Pierre. 1997. *Geostatistics for Natural Resources
 Evaluation*. Oxford University Press.
 
 </div>
 
-<div id="ref-Goovaerts2000">
+<div id="ref-Goovaerts2000" class="csl-entry">
 
 ———. 2000. “Geostatistical Approaches for Incorporating Elevation into
 the Spatial Interpolation of Rainfall.” *Journal of Hydrology* 228 (1):
@@ -242,26 +239,25 @@ the Spatial Interpolation of Rainfall.” *Journal of Hydrology* 228 (1):
 
 </div>
 
-<div id="ref-gstat2">
+<div id="ref-gstat2" class="csl-entry">
 
 Gräler, Benedikt, Edzer Pebesma, and Gerard Heuvelink. 2016.
-“Spatio-Temporal Interpolation Using Gstat.” *The R Journal* 8 (1):
-204–18.
+“Spatio-Temporal Interpolation Using Gstat.” *The R Journal* 8: 204–18.
 <https://journal.r-project.org/archive/2016-1/na-pebesma-heuvelink.pdf>.
 
 </div>
 
-<div id="ref-gstat1">
+<div id="ref-gstat1" class="csl-entry">
 
 Pebesma, Edzer J. 2004. “Multivariable Geostatistics in S: The Gstat
 Package.” *Computers & Geosciences* 30: 683–91.
 
 </div>
 
-<div id="ref-devtools2019">
+<div id="ref-devtools2019" class="csl-entry">
 
 Wickham, Hadley, Jim Hester, and Winston Chang. 2019. *Devtools: Tools
-to Make Developing R Packages Easier*.
+to Make Developing r Packages Easier*.
 <https://github.com/r-lib/devtools>.
 
 </div>
